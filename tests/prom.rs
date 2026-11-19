@@ -2,11 +2,11 @@
 
 use std::path::Path;
 
-use tempdes::config::dynamic::{Constraints, DcValue};
-use tempdes::config::scenario::Scenario;
-use tempdes::model::build;
-use tempdes::report::prom::{self, Reading};
-use tempdes::run::{self, Overrides};
+use durable_envision::config::dynamic::{Constraints, DcValue};
+use durable_envision::config::scenario::Scenario;
+use durable_envision::model::build;
+use durable_envision::report::prom::{self, Reading};
+use durable_envision::run::{self, Overrides};
 
 fn baseline() -> Scenario {
     Scenario::load(&Path::new(env!("CARGO_MANIFEST_DIR")).join("examples/scenarios/baseline.yaml"))

@@ -292,7 +292,7 @@ impl Semaphore {
     }
 
     /// Permit-microseconds held since the statistics window started: a cheap monotonic
-    /// counter for interval sampling (`tempdes ui`), without computing quantiles.
+    /// counter for interval sampling (`durable-envision ui`), without computing quantiles.
     pub fn busy_us(&self) -> f64 {
         let mut st = self.st.borrow_mut();
         st.account();

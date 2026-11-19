@@ -1,9 +1,9 @@
 # Temporal on EKS: how clients reach the frontend
 
-This guide covers how SDK workers and clients should connect to the Temporal frontend on Amazon
-EKS. It shows the choice as tempdes simulates it, then gives a setup for each option. Only the
-frontend is reached through a Kubernetes Service. History, matching and worker pods find each
-other through Temporal's membership ring.
+This guide covers how SDK workers and clients should connect to the Temporal frontend on Amazon EKS.
+It shows the choice as Durable Envision simulates it, then gives a setup for each option. Only the
+frontend is reached through a Kubernetes Service. History, matching and worker pods find each other
+through Temporal's membership ring.
 
 ## Why the connection model matters
 
@@ -182,7 +182,7 @@ spec:
 
 Clients then connect to `temporal.example.internal:443` with TLS.
 
-- **Latency.** The ALB adds a hop: tempdes defaults `proxy_latency` to 1 ms.
+- **Latency.** The ALB adds a hop: Durable Envision defaults `proxy_latency` to 1 ms.
 - **Registration delay.** A new pod waits for registration and health checks before it gets
   traffic (`proxy_discovery`, default 15 s).
 - **Health checks.** The gRPC health check succeeds while the frontend is still NOT_SERVING
@@ -196,25 +196,25 @@ clusters. Make sure the proxies' request timeouts exceed the ~70 s long poll.
 
 - **Even spreading.** With `round_robin` or `proxy`, each frontend carries about the total
   divided by the number of pods. Size `frontend.rps` and `frontend.namespaceRPS` with headroom
-  over that; tempdes warns at 70% of a limit.
+  over that; Durable Envision warns at 70% of a limit.
 - **Pinned connections.** With `pinned`, the busiest pod ran up to 1.49× the mean in the runs
   above. Size for the busiest pod, or change mode.
 - **Global limits.** `frontend.globalNamespaceRPS` divides a cluster budget by the number of
   frontends. It doesn't follow where the load is, so it pairs badly with pinned connections.
 
-## Trying it with tempdes
+## Trying it with Durable Envision
 
 ```bash
 # the three modes side by side, at 3 and 4 frontends
-tempdes sweep examples/scenarios/frontend-lb.yaml --rows frontend=3,4 \
+durable-envision sweep examples/scenarios/frontend-lb.yaml --rows frontend=3,4 \
     --cols client_lb=pinned,round_robin,proxy
 
 # a 3 -> 6 frontend scale-out, with the default and a 1-minute max connection age
-tempdes sweep examples/scenarios/frontend-scale-out.yaml --rows frontend=3 \
+durable-envision sweep examples/scenarios/frontend-scale-out.yaml --rows frontend=3 \
     --cols client_lb=pinned,round_robin,proxy --cols frontend.keepAliveMaxConnectionAge=5m,1m
 
 # any scenario, one mode
-tempdes run my-cluster.yaml --client-lb round_robin
+durable-envision run my-cluster.yaml --client-lb round_robin
 ```
 
 In a scenario:

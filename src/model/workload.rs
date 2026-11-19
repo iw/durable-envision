@@ -21,8 +21,8 @@ pub struct Rates {
     pub start: Vec<f64>,
     /// per signal load (index into `Params::signals`), changed by `signal_rate` events
     pub signal: Vec<f64>,
-    /// Live multiplier on every start and signal rate, changed between steps by `tempdes ui`.
-    /// Always 1.0 in a CLI run.
+    /// Live multiplier on every start and signal rate, changed between steps by
+    /// `durable-envision ui`. Always 1.0 in a CLI run.
     pub scale: f64,
 }
 

@@ -2,8 +2,8 @@
 # of the signal traffic: every signal takes the cart's workflow lock and a write on its shard,
 # so those carts saturate regardless of how many history pods you run.
 #
-#   tempdes run examples/scenarios/hot-entity.yaml
-#   tempdes sweep examples/scenarios/hot-entity.yaml --rows history=4,8 --cols history.shardIOConcurrency=1,4
+#   durable-envision run examples/scenarios/hot-entity.yaml
+#   durable-envision sweep examples/scenarios/hot-entity.yaml --rows history=4,8 --cols history.shardIOConcurrency=1,4
 name: cart-entities
 seed: 11
 warmup: 20s

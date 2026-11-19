@@ -1,5 +1,5 @@
-//! The profile `tempdes profile init` writes: a `profile.yaml` and a `scenario.yaml` with every
-//! setting commented, the optional ones commented out with their defaults or an example.
+//! The profile `durable-envision profile init` writes: a `profile.yaml` and a `scenario.yaml` with
+//! every setting commented, the optional ones commented out with their defaults or an example.
 //!
 //! The sources mark what is commented out. Lines between `#{off` and `#}off` are commented out
 //! in what `init` writes ([`Variant::Template`]) and switched on in [`Variant::Full`], which the

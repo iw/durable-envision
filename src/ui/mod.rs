@@ -1,4 +1,4 @@
-//! `tempdes ui`: a live visualisation of the simulated cluster, served by the
+//! `durable-envision ui`: a live visualisation of the simulated cluster, served by the
 //! [Topcoat](https://github.com/tokio-rs/topcoat) web framework.
 //!
 //! * [`engine`] runs the simulation on its own thread, paced to wall-clock time, and applies

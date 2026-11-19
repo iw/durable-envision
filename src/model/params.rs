@@ -402,8 +402,8 @@ pub struct ActTimeouts {
 impl ActTimeouts {
     /// Normalise as the server does, with no workflow run timeout: a schedule-to-close timeout
     /// bounds and fills in schedule-to-start and start-to-close; without it, start-to-close is
-    /// required, and tempdes fills in `default_start_to_close` where an SDK would refuse the
-    /// command. The heartbeat timeout never exceeds start-to-close.
+    /// required, and Durable Envision fills in `default_start_to_close` where an SDK would refuse
+    /// the command. The heartbeat timeout never exceeds start-to-close.
     pub fn normalize(
         schedule_to_start: Option<Time>,
         start_to_close: Option<Time>,

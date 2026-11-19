@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to tempdes are documented in this file.
+All notable changes to Durable Envision are documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
@@ -379,6 +379,35 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
     and in each step the longest first attempt's. Left out of the steps, they bring a simulated
     run to its children that much sooner, unless the scenario's cluster makes it wait as long.
 
+### Changed
+
+- **tempdes is now Durable Envision.** Only names change: every command, option, file format
+  and result is as before. Nothing reads the old names, so change them where you use them:
+  - **Repository.** `https://github.com/iw/durable-envision`. GitHub redirects the old address,
+    `https://github.com/iw/tempdes`.
+  - **Install command.**
+    `cargo install --locked --git https://github.com/iw/durable-envision durable-envision`.
+    `cargo uninstall tempdes` removes the command installed before.
+  - **Command.** `durable-envision` rather than `tempdes`, as in
+    `durable-envision run scenario.yaml`, and `target/release/durable-envision` in a clone.
+    `gen-dc-registry` keeps its name.
+  - **Crate.** The package is `durable-envision` and its library `durable_envision`, so
+    `use tempdes::…` becomes `use durable_envision::…`.
+  - **Environment variable.** `DURABLE_ENVISION_PROFILES` rather than `TEMPDES_PROFILES`.
+  - **Profile store.** `~/.config/durable-envision/profiles` rather than
+    `~/.config/tempdes/profiles`; on Windows `%APPDATA%\durable-envision\profiles` rather than
+    `%APPDATA%\tempdes\profiles`; and under `$XDG_CONFIG_HOME`, `durable-envision/profiles`
+    rather than `tempdes/profiles`. Saved profiles aren't moved for you: move the `profiles`
+    folder to its new place, or name the old one in `DURABLE_ENVISION_PROFILES`. While only
+    the old folder exists, every command that uses the store says where it is.
+  - **Metric names.** `run --prom` writes `durable_envision_pod_cpu_utilization` and
+    `durable_envision_database_utilization` rather than `tempdes_pod_cpu_utilization` and
+    `tempdes_database_utilization`. Temporal's own metric names are as they were.
+  - **Titles.** Reports, the live view and the comments that head the files the tool writes
+    say Durable Envision where they said tempdes: a text report opens with
+    `Durable Envision · Temporal 1.31.0`, a Markdown one with `# Durable Envision:`, and a
+    `--prom` file with `# Durable Envision simulated metrics`.
+
 ### Fixed
 
 - **The task scheduler's rate limiter is no longer taken for busy workers.** The scheduling
@@ -564,4 +593,4 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   and `workload fetch`, moves from rustls 0.23.45, which RUSTSEC-2026-0346, -0347, -0348 and
   -0349 affect.
 
-[Unreleased]: https://github.com/iw/tempdes/commits/main
+[Unreleased]: https://github.com/iw/durable-envision/commits/main

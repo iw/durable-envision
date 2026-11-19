@@ -1,4 +1,4 @@
-//! `tempdes dc …` — inspect and validate Temporal 1.31.0 dynamic config.
+//! `durable-envision dc …` — inspect and validate Temporal 1.31.0 dynamic config.
 
 use std::path::PathBuf;
 use std::process::ExitCode;
@@ -34,7 +34,7 @@ pub fn run(cmd: Cmd) -> anyhow::Result<ExitCode> {
     match cmd {
         Cmd::Modeled => {
             println!(
-                "Dynamic config keys modelled by tempdes (Temporal {}):\n",
+                "Dynamic config keys modelled by Durable Envision (Temporal {}):\n",
                 reg.temporal_version
             );
             // group by prefix, keeping the order in which prefixes first appear

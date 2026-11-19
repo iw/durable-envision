@@ -310,7 +310,7 @@ mod tests {
             (t.schedule_to_start, t.schedule_to_close, t.heartbeat),
             (0, 0, 30 * s)
         );
-        // neither: tempdes's default start-to-close
+        // neither: Durable Envision's default start-to-close
         let t = ActTimeouts::normalize(Some(5 * s), None, None, None, 10 * s);
         assert_eq!((t.schedule_to_start, t.start_to_close), (5 * s, 10 * s));
     }

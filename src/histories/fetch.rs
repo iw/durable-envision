@@ -1,4 +1,4 @@
-//! `tempdes workload fetch`: histories read from a Temporal frontend, for `import`.
+//! `durable-envision workload fetch`: histories read from a Temporal frontend, for `import`.
 //!
 //! The executions started in a window are listed (`ListWorkflowExecutions`) one slice of the
 //! window at a time, and counted by type: in all and slice by slice, by how they stood when
@@ -787,8 +787,9 @@ fn create_output(out: &Path) -> anyhow::Result<()> {
 fn write_manifest(out: &Path, m: &Manifest) -> anyhow::Result<()> {
     let yaml = serde_saphyr::to_string(m).map_err(|e| anyhow!("writing {MANIFEST}: {e}"))?;
     let text = format!(
-        "# Written by `tempdes workload fetch`: the executions it listed and fetched. `tempdes workload\n\
-         # import` takes each type's start rate from these counts. Keep it private.\n{yaml}"
+        "# Written by `durable-envision workload fetch`: the executions it listed and fetched.\n\
+         # `durable-envision workload import` takes each type's start rate from these counts.\n\
+         # Keep it private.\n{yaml}"
     );
     crate::profile::write_private(&out.join(MANIFEST), text.as_bytes())
 }

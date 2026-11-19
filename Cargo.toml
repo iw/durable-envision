@@ -1,26 +1,26 @@
 [package]
-name = "tempdes"
+name = "durable-envision"
 version = "0.1.0"
 edition = "2024"
 rust-version = "1.98.1"
 description = "Discrete-event simulator that surfaces hotspots in Temporal 1.31.0 clusters on EKS"
 license = "MIT OR Apache-2.0"
-repository = "https://github.com/iw/tempdes"
-homepage = "https://github.com/iw/tempdes"
+repository = "https://github.com/iw/durable-envision"
+homepage = "https://github.com/iw/durable-envision"
 readme = "README.md"
 keywords = ["temporal", "simulation", "discrete-event", "capacity-planning", "kubernetes"]
 categories = ["simulation", "command-line-utilities", "development-tools"]
-default-run = "tempdes"
+default-run = "durable-envision"
 exclude = ["/.github", "/out"]
 
 [features]
 default = ["ui", "fetch"]
-# `tempdes ui`: the live visualisation served by the Topcoat web framework. Disable it for a
-# lean, dependency-light CLI build (`--no-default-features`).
+# `durable-envision ui`: the live visualisation served by the Topcoat web framework. Disable it for
+# a lean, dependency-light CLI build (`--no-default-features`).
 ui = ["dep:topcoat", "dep:tokio", "dep:futures-util"]
-# `tempdes metrics fetch` / `scan`: read observations from a Prometheus HTTP API; and
-# `tempdes workload fetch`: read histories from a Temporal frontend's HTTP API, connecting with
-# the Temporal CLI's `temporal.toml` profiles. Over rustls with the system's trusted
+# `durable-envision metrics fetch` / `scan`: read observations from a Prometheus HTTP API; and
+# `durable-envision workload fetch`: read histories from a Temporal frontend's HTTP API, connecting
+# with the Temporal CLI's `temporal.toml` profiles. Over rustls with the system's trusted
 # certificates (no OpenSSL).
 fetch = ["dep:ureq", "dep:rustls", "dep:toml"]
 

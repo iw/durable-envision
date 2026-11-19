@@ -576,7 +576,7 @@ pub fn run(ctx: &Ctx, mut ex: Executor) -> RunInfo {
 
 /// Spawn everything that drives a built cluster (SDK workers and clients, workload generators,
 /// the sampler, the warm-up reset and the timeline events) on `ex` without running it. The
-/// caller then advances the executor, all at once (`run`) or in slices (`tempdes ui`). The
+/// caller then advances the executor, all at once (`run`) or in slices (`durable-envision ui`). The
 /// returned rates are read by the generators on every arrival, so a caller stepping the
 /// executor can change the load between steps.
 pub fn start(ctx: &Ctx, ex: &mut Executor) -> Rc<RefCell<Rates>> {

@@ -1,8 +1,9 @@
 # Code of conduct
 
-tempdes follows the [Rust Code of Conduct](https://www.rust-lang.org/policies/code-of-conduct).
-It sets out the minimum behaviour expected from everyone who takes part in the project, in
-issues, pull requests, reviews and any other project space.
+Durable Envision follows the
+[Rust Code of Conduct](https://www.rust-lang.org/policies/code-of-conduct). It sets out the
+minimum behaviour expected from everyone who takes part in the project, in issues, pull requests,
+reviews and any other project space.
 
 In short:
 

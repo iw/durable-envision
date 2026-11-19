@@ -1,11 +1,14 @@
-# tempdes
+# Durable Envision
 
-[![CI](https://github.com/iw/tempdes/actions/workflows/ci.yml/badge.svg)](https://github.com/iw/tempdes/actions/workflows/ci.yml)
+[![CI](https://github.com/iw/durable-envision/actions/workflows/ci.yml/badge.svg)](https://github.com/iw/durable-envision/actions/workflows/ci.yml)
 [![License: MIT OR Apache-2.0](https://img.shields.io/badge/license-MIT%20OR%20Apache--2.0-blue.svg)](#license)
 [![Rust 1.98.1](https://img.shields.io/badge/rust-1.98.1-orange.svg?logo=rust)](rust-toolchain.toml)
 
 A discrete-event simulator that finds hotspots in **Temporal Server 1.31.0** clusters running on
 EKS, before they show up in production.
+
+Durable Envision was called tempdes before. [CHANGELOG.md](CHANGELOG.md) lists every name that
+changed with it, from the command to the profile store.
 
 You describe a deployment and a workload. Two dimensions are adjustable:
 
@@ -13,18 +16,18 @@ You describe a deployment and a workload. Two dimensions are adjustable:
 * **dynamic config**, in Temporal's own file format, for the settings that matter most for
   throughput. 97 settings are simulated, and all 613 keys in 1.31.0 are validated.
 
-tempdes simulates the cluster request by request and reports what saturates first: CPU, database
-connections, a shard's IO semaphore, a single workflow's lock, a rate limiter, a history task
-queue, a task-queue partition, or shard movement during a rollout. Each finding names the
+Durable Envision simulates the cluster request by request and reports what saturates first: CPU,
+database connections, a shard's IO semaphore, a single workflow's lock, a rate limiter, a history
+task queue, a task-queue partition, or shard movement during a rollout. Each finding names the
 Temporal metrics to watch and the dynamic config keys (or replica counts) that change it.
 
 You can also give it **metrics your cluster already emits** (`persistence_latency`,
-`service_requests`, CPU usage and others). tempdes uses them to calibrate database service times,
-per-service CPU costs and workload rates. It then prints a table comparing its predictions with
-your observed values.
+`service_requests`, CPU usage and others). Durable Envision uses them to calibrate database service
+times, per-service CPU costs and workload rates. It then prints a table comparing its predictions
+with your observed values.
 
 ```text
-$ tempdes run examples/scenarios/hot-entity.yaml
+$ durable-envision run examples/scenarios/hot-entity.yaml
 
   4 critical / 1 warning hotspots — top: workflow lock contention (lock wait p99 9.50s, 5998 BUSY_WORKFLOW
   timeouts). Busiest resource: shard 151 IO at 100%.
@@ -57,33 +60,34 @@ $ tempdes run examples/scenarios/hot-entity.yaml
 - [Example scenarios](#example-scenarios)
 - [What is modelled](#what-is-modelled)
 - [Limitations](#limitations)
+- [Related projects](#related-projects)
 - [Development](#development)
 - [Contributing](#contributing)
 - [License](#license)
 
 ## Install
 
-tempdes needs **Rust 1.98.1** or newer (edition 2024). To install the `tempdes` command from
-this repository:
+Durable Envision needs **Rust 1.98.1** or newer (edition 2024). To install the `durable-envision`
+command from this repository:
 
 ```bash
-cargo install --locked --git https://github.com/iw/tempdes tempdes
+cargo install --locked --git https://github.com/iw/durable-envision durable-envision
 ```
 
 To build from a clone instead, run the following. `rust-toolchain.toml` pins 1.98.1, and rustup
 installs it on first use.
 
 ```bash
-git clone https://github.com/iw/tempdes && cd tempdes
+git clone https://github.com/iw/durable-envision && cd durable-envision
 cargo build --release
 ```
 
-The binary is `target/release/tempdes`. The simulator itself depends only on `serde`,
+The binary is `target/release/durable-envision`. The simulator itself depends only on `serde`,
 `serde-saphyr` (YAML), `serde_json`, `clap` and `anyhow`. Two default features add more:
-* `ui` (`tempdes ui`, the live view) adds the [Topcoat](https://github.com/tokio-rs/topcoat)
-  web framework and tokio;
-* `fetch` (`tempdes metrics fetch` and `scan`, and `tempdes workload fetch`) adds the `ureq`
-  HTTP client over rustls, and `toml` to read the Temporal CLI's profiles. It trusts the
+* `ui` (`durable-envision ui`, the live view) adds the
+  [Topcoat](https://github.com/tokio-rs/topcoat) web framework and tokio;
+* `fetch` (`durable-envision metrics fetch` and `scan`, and `durable-envision workload fetch`) adds
+  the `ureq` HTTP client over rustls, and `toml` to read the Temporal CLI's profiles. It trusts the
   system's certificates, so it needs no OpenSSL.
 
 `--no-default-features` builds the lean command-line tool. The simulation runs
@@ -94,44 +98,46 @@ seconds. Sweeps run their cells in parallel.
 
 ```bash
 # one configuration → hotspot report (exit code 1 if anything is critical)
-tempdes run examples/scenarios/baseline.yaml
+durable-envision run examples/scenarios/baseline.yaml
 
 # change the two dimensions from the command line
-tempdes run examples/scenarios/baseline.yaml -r history=6 -d history.shardIOConcurrency=4
+durable-envision run examples/scenarios/baseline.yaml -r history=6 -d history.shardIOConcurrency=4
 
 # how clients reach the frontends: pinned connections, gRPC round robin or an L7 proxy
-tempdes sweep examples/scenarios/frontend-lb.yaml --rows frontend=3,4 \
+durable-envision sweep examples/scenarios/frontend-lb.yaml --rows frontend=3,4 \
     --cols client_lb=pinned,round_robin,proxy
 
 # grid: replica counts down, dynamic config across
-tempdes sweep examples/scenarios/baseline.yaml --load 1.3 \
+durable-envision sweep examples/scenarios/baseline.yaml --load 1.3 \
     --rows matching=3,4,6 --cols matching.rps=1200,2400 --html out/sweep.html
 
 # watch a run live in the browser, changing load, replicas and dynamic config as it runs
-tempdes ui examples/scenarios/baseline.yaml --open
+durable-envision ui examples/scenarios/baseline.yaml --open
 
 # calibrate against production metrics, then compare predictions with observations
-tempdes run examples/scenarios/baseline.yaml -o examples/metrics/observed.yaml
+durable-envision run examples/scenarios/baseline.yaml -o examples/metrics/observed.yaml
 
 # save a run as a private, named profile and repeat it by name
-tempdes profile save prod my-cluster.yaml -r history=4 -o observed.yaml
-tempdes run --profile prod --load 1.5
+durable-envision profile save prod my-cluster.yaml -r history=4 -o observed.yaml
+durable-envision run --profile prod --load 1.5
 
 # dynamic config tooling
-tempdes dc modeled                       # the 100 simulated keys, with 1.31.0 defaults
-tempdes dc explain history.shardIOConcurrency
-tempdes dc validate examples/dynamicconfig/with-mistakes.yaml
+durable-envision dc modeled                       # the 100 simulated keys, with 1.31.0 defaults
+durable-envision dc explain history.shardIOConcurrency
+durable-envision dc validate examples/dynamicconfig/with-mistakes.yaml
 
 # metrics tooling
-tempdes metrics queries --window 15m     # PromQL to collect calibration inputs
-tempdes metrics template > observed.yaml
-tempdes metrics show examples/metrics/observed.yaml
+durable-envision metrics queries --window 15m     # PromQL to collect calibration inputs
+durable-envision metrics template > observed.yaml
+durable-envision metrics show examples/metrics/observed.yaml
 
 # workloads from workflow histories (steps, durations, attempts, retry policies), fetched from
 # the cluster with a Temporal CLI profile, through the Temporal CLI itself, or exported
-tempdes workload fetch --temporal-profile prod --end 2026-10-01T22:17Z --window 15m -o histories
-tempdes workload fetch --cli --namespace orders --end 2026-10-01T22:17Z --window 2h -o histories
-tempdes workload import histories/ --namespace orders -o workflows.yaml
+durable-envision workload fetch --temporal-profile prod --end 2026-10-01T22:17Z --window 15m \
+    -o histories
+durable-envision workload fetch --cli --namespace orders --end 2026-10-01T22:17Z --window 2h \
+    -o histories
+durable-envision workload import histories/ --namespace orders -o workflows.yaml
 ```
 
 `run` also writes `--json` (the full result), `--prom` (simulated metrics in Prometheus text
@@ -213,8 +219,8 @@ Sweep columns use `--cols key=v1,v2,v3`. Two pseudo-keys also work: `load=0.5,1,
 start and signal rates, and `client_lb=pinned,round_robin,proxy` changes how clients reach the
 frontends.
 
-`tempdes dc validate FILE` checks a production dynamic config file against the 1.31.0 registry.
-It exits 1 when it finds problems. It catches:
+`durable-envision dc validate FILE` checks a production dynamic config file against the 1.31.0
+registry. It exits 1 when it finds problems. It catches:
 
 * typos, with did-you-mean suggestions;
 * type mismatches;
@@ -226,7 +232,7 @@ useful fix for a hotspot, the report marks it *(not simulated)*.
 
 ### Simulated settings (highlights)
 
-Run `tempdes dc modeled` for the full list of 99 keys with their defaults and descriptions.
+Run `durable-envision dc modeled` for the full list of 99 keys with their defaults and descriptions.
 
 | Area | Keys |
 |---|---|
@@ -241,12 +247,12 @@ Run `tempdes dc modeled` for the full list of 99 keys with their defaults and de
 
 Static config that behaves like a dimension is part of `cluster`: `numHistoryShards`, SQL
 `maxConns` per pod, and the store type. With Cassandra, Temporal forces
-`history.shardIOConcurrency` to 1, and tempdes does the same with a warning.
+`history.shardIOConcurrency` to 1, and Durable Envision does the same with a warning.
 
 ## Sweeps: replicas × dynamic config
 
 ```bash
-tempdes sweep examples/scenarios/baseline.yaml --load 1.3 \
+durable-envision sweep examples/scenarios/baseline.yaml --load 1.3 \
     --rows matching=3,4,6 --cols matching.rps=1200,2400
 ```
 
@@ -289,11 +295,11 @@ with per-cell detail. `--md` writes the same tables as Markdown.
 ## Watching a run live
 
 ```bash
-tempdes ui examples/scenarios/baseline.yaml --open
-tempdes ui examples/scenarios/db-bound.yaml --speed 5 -r history=6
+durable-envision ui examples/scenarios/baseline.yaml --open
+durable-envision ui examples/scenarios/db-bound.yaml --speed 5 -r history=6
 ```
 
-`tempdes ui` serves the simulation as it runs, at a chosen multiple of real time (warm-up
+`durable-envision ui` serves the simulation as it runs, at a chosen multiple of real time (warm-up
 runs at full speed). The page shows the cluster as a figure of the request paths, with CPU per
 pod, the limiter closest to its limit on each service, and the flows between services; two
 rows of stages, one for the request path (clients → frontend → history → persistence) and one
@@ -323,23 +329,23 @@ Observed metrics serve two purposes: **calibration** changes the model's paramet
 **validation** compares the model's predictions with production.
 
 ```bash
-tempdes metrics queries --window 15m   # the PromQL to run
-tempdes metrics template               # an annotated observations file
-tempdes run scenario.yaml -o observed.yaml
+durable-envision metrics queries --window 15m   # the PromQL to run
+durable-envision metrics template               # an annotated observations file
+durable-envision run scenario.yaml -o observed.yaml
 ```
 
-With access to the Prometheus HTTP API, `tempdes metrics fetch` runs those queries itself:
+With access to the Prometheus HTTP API, `durable-envision metrics fetch` runs those queries itself:
 
 ```bash
 # the rate of workflow-starting calls, minute by minute, and the steadiest windows
-tempdes metrics scan --url https://prometheus.example \
+durable-envision metrics scan --url https://prometheus.example \
     --from 2026-10-01T21:40Z --to 2026-10-01T23:00Z
 # the observations for the 15 minutes ending at --end, and for the 15 minutes before the run
-tempdes metrics fetch --url https://prometheus.example --end 2026-10-01T22:17Z --window 15m \
-    -o observed.yaml --baseline-end 2026-10-01T21:55Z --rename orders-prod=orders
+durable-envision metrics fetch --url https://prometheus.example --end 2026-10-01T22:17Z \
+    --window 15m -o observed.yaml --baseline-end 2026-10-01T21:55Z --rename orders-prod=orders
 # the same, into profile prod's metrics folder in the store
-tempdes metrics fetch --url https://prometheus.example --end 2026-10-01T22:17Z --window 15m \
-    --profile prod --baseline-end 2026-10-01T21:55Z --rename orders-prod=orders
+durable-envision metrics fetch --url https://prometheus.example --end 2026-10-01T22:17Z \
+    --window 15m --profile prod --baseline-end 2026-10-01T21:55Z --rename orders-prod=orders
 ```
 
 These commands work as follows:
@@ -364,8 +370,8 @@ These commands work as follows:
   verification.
 * **CPU and the database.** `--cpu-selector` picks Temporal's containers in cAdvisor's metrics.
   `--db-utilization` or `--db-utilization-query` adds the database's busy fraction.
-* **The dispatch path.** `fetch` also records six metrics that tempdes doesn't read yet. They
-  show where a task's schedule-to-start goes, to compare with a simulation by eye:
+* **The dispatch path.** `fetch` also records six metrics that Durable Envision doesn't read yet.
+  They show where a task's schedule-to-start goes, to compare with a simulation by eye:
   * `cache_latency` (mutable state): getting a workflow from history's cache, which waits for
     its lock;
   * `syncmatch_latency`: `AddActivityTask` and `AddWorkflowTask` for tasks handed straight to a
@@ -451,15 +457,16 @@ histories, a few hundred executions of each workflow type. `workload fetch` read
 frontend (see [Fetching histories](#fetching-histories)):
 
 ```bash
-tempdes workload fetch --temporal-profile prod --end 2026-10-01T22:17Z --window 15m -o histories
-tempdes workload import histories/ --namespace orders -o workflows.yaml
+durable-envision workload fetch --temporal-profile prod --end 2026-10-01T22:17Z --window 15m \
+    -o histories
+durable-envision workload import histories/ --namespace orders -o workflows.yaml
 ```
 
 Histories exported another way import too:
 
 ```bash
 temporal workflow show --workflow-id <id> --output json > histories/<id>.json   # or the Web UI's download
-tempdes workload import histories/ --namespace orders --rate 150/s -o workflows.yaml
+durable-envision workload import histories/ --namespace orders --rate 150/s -o workflows.yaml
 ```
 
 The importer prints a `workflows:` block, a commented `workers:` block to start the worker
@@ -617,23 +624,23 @@ out, with their defaults or an example. It runs as written, as an example cluste
 to edit into yours.
 
 ```bash
-tempdes profile init staging --description "staging, to fill in"   # a prototype to edit
-tempdes profile save prod my-cluster.yaml -r history=4 --client-lb round_robin -o observed.yaml \
-    --description "production, weekday peak"
-tempdes run --profile prod                  # the saved run
-tempdes run --profile prod --load 1.5       # the saved run at 1.5x load
-tempdes sweep --profile prod --rows history=4,5,6 --cols load=1,1.5
-tempdes profile save prod-6h --profile prod -r history=6     # a new profile based on prod
-tempdes profile list
-tempdes profile show prod
-tempdes profile remove prod-6h
+durable-envision profile init staging --description "staging, to fill in"   # a prototype to edit
+durable-envision profile save prod my-cluster.yaml -r history=4 --client-lb round_robin \
+    -o observed.yaml --description "production, weekday peak"
+durable-envision run --profile prod                  # the saved run
+durable-envision run --profile prod --load 1.5       # the saved run at 1.5x load
+durable-envision sweep --profile prod --rows history=4,5,6 --cols load=1,1.5
+durable-envision profile save prod-6h --profile prod -r history=6     # a new profile based on prod
+durable-envision profile list
+durable-envision profile show prod
+durable-envision profile remove prod-6h
 ```
 
 Profiles usually describe a real cluster, so they are kept private and outside any repository:
 
-* **Location.** The store is `~/.config/tempdes/profiles`, or `%APPDATA%\tempdes\profiles` on
-  Windows. `$XDG_CONFIG_HOME/tempdes/profiles` or `$TEMPDES_PROFILES` override it, and
-  `tempdes profile dir` prints it.
+* **Location.** The store is `~/.config/durable-envision/profiles`, or
+  `%APPDATA%\durable-envision\profiles` on Windows. `$XDG_CONFIG_HOME/durable-envision/profiles` or
+  `$DURABLE_ENVISION_PROFILES` override it, and `durable-envision profile dir` prints it.
 * **Layout.** Each profile is a directory:
 
   ```
@@ -972,7 +979,7 @@ source. In summary:
 
 ## Limitations
 
-tempdes is a model. Use its findings to decide what to load-test and which metric to watch.
+Durable Envision is a model. Use its findings to decide what to load-test and which metric to watch.
 Don't treat them as guarantees.
 
 * **CPU costs.** The default per-operation costs are estimates for mid-size pods. Calibrate them
@@ -1001,8 +1008,18 @@ Don't treat them as guarantees.
   `NotFound` where Temporal returns `InvalidArgument`. The event count limit
   (`limit.historyCount.error`), the mutable state size limit and the gRPC message size limit are
   not enforced, and neither is continue-as-new.
-* **Settings without an effect.** Dynamic config keys outside `tempdes dc modeled` are
+* **Settings without an effect.** Dynamic config keys outside `durable-envision dc modeled` are
   validated and shown, but they don't change the simulation.
+
+## Related projects
+
+Durable Envision simulates a cluster to find its hotspots before production does. Two sister
+projects look at the workflows' code, and at a deployment that is already running:
+
+* [Durable Atlas](https://github.com/iw/durable-atlas), diagrams of Temporal workflows read from
+  their Kotlin source, with recorded executions laid over them.
+* [Durable Inquiry](https://github.com/iw/kyumei), evidence-driven diagnostics that find out why
+  a running Temporal deployment is misbehaving.
 
 ## Development
 
@@ -1068,6 +1085,7 @@ Unless you explicitly state otherwise, any contribution intentionally submitted 
 the work by you, as defined in the Apache-2.0 license, shall be dual licensed as above, without any
 additional terms or conditions.
 
-Parts of tempdes are derived from go-farm and ringpop-go, and the dynamic config registry is
-extracted from Temporal. [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) has their notices.
-tempdes is an independent project and is not affiliated with or endorsed by Temporal Technologies.
+Parts of Durable Envision are derived from go-farm and ringpop-go, and the dynamic config registry
+is extracted from Temporal. [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) has their notices.
+Durable Envision is an independent project and is not affiliated with or endorsed by Temporal
+Technologies.

@@ -476,8 +476,8 @@ pub enum IdPattern {
     Unique,
 }
 
-/// `workflows:` as the scenario writes it: the workflow types, or the path of a file holding
-/// them under its own `workflows:` (what `tempdes workload import` writes), or of a folder with
+/// `workflows:` as the scenario writes it: the workflow types, or the path of a file holding them
+/// under its own `workflows:` (what `durable-envision workload import` writes), or of a folder with
 /// a `workflows.yaml`.
 #[derive(Clone, Debug)]
 enum Workflows {
@@ -524,7 +524,7 @@ impl<'de> Deserialize<'de> for Workflows {
     }
 }
 
-/// A file of workflow types, as `tempdes workload import` writes it.
+/// A file of workflow types, as `durable-envision workload import` writes it.
 #[derive(Deserialize)]
 #[serde(deny_unknown_fields)]
 struct WorkflowsFile {
@@ -978,7 +978,7 @@ impl Scenario {
         let path = self.resolve_path(&file);
         anyhow::ensure!(
             path.exists(),
-            "workflows: {} doesn't exist; `tempdes workload import` writes the workflows a scenario can name",
+            "workflows: {} doesn't exist; `durable-envision workload import` writes the workflows a scenario can name",
             path.display()
         );
         let text = std::fs::read_to_string(&path)

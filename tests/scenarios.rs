@@ -4,12 +4,12 @@
 
 use std::path::Path;
 
-use tempdes::config::dynamic::{Constraints, DcValue};
-use tempdes::config::scenario::{ClientLb, Scenario};
-use tempdes::model::types::{Api, HistApi, PersistOp, TaskType};
-use tempdes::report::{self, RunResult, Severity};
-use tempdes::run::{self, Overrides};
-use tempdes::util::units::Dur;
+use durable_envision::config::dynamic::{Constraints, DcValue};
+use durable_envision::config::scenario::{ClientLb, Scenario};
+use durable_envision::model::types::{Api, HistApi, PersistOp, TaskType};
+use durable_envision::report::{self, RunResult, Severity};
+use durable_envision::run::{self, Overrides};
+use durable_envision::util::units::Dur;
 
 fn scenario(file: &str) -> Scenario {
     Scenario::load(
@@ -767,7 +767,7 @@ fn a_namespace_scheduler_limit_holds_tasks_back_without_busy_workers() {
         .find(|t| t.task_type == "TimerActiveTaskWorkflowTaskTimeout")
         .expect("held-back timeouts");
     assert!(timeouts.sched_throttled_per_s > 0.0);
-    let text = tempdes::report::prom::render(&out.ctx);
+    let text = durable_envision::report::prom::render(&out.ctx);
     assert!(
         text.lines()
             .any(|l| l.starts_with("task_scheduler_throttled{")
@@ -785,11 +785,11 @@ fn a_namespace_scheduler_limit_holds_tasks_back_without_busy_workers() {
     );
     assert!(queued > 1_000_000.0, "task_latency_queue mean {queued}µs");
     // the history task tables show the hold-back before the scheduling wait
-    let md = tempdes::report::markdown::render_run(&r, false);
+    let md = durable_envision::report::markdown::render_run(&r, false);
     assert!(md.contains("| load p99 | held back p99 | schedule p99 |"));
-    let text = tempdes::report::text::render(&r, false);
+    let text = durable_envision::report::text::render(&r, false);
     assert!(text.contains("load p99  held back p99  sched p99"));
-    let html = tempdes::report::html::render_run(&r);
+    let html = durable_envision::report::html::render_run(&r);
     assert!(html.contains("held back p99</th><th class=\"n\">schedule p99"));
 }
 
@@ -861,7 +861,7 @@ fn busy_scheduler_workers_show_without_the_limiter() {
         "{:#?}",
         categories(&r)
     );
-    let md = tempdes::report::markdown::render_run(&r, false);
+    let md = durable_envision::report::markdown::render_run(&r, false);
     assert!(!md.contains("held back p99"));
 }
 
@@ -1076,8 +1076,8 @@ fn execution_queue_waits_are_not_put_down_to_scheduler_workers() {
 #[test]
 fn markdown_report_covers_the_run() {
     let r = simulate("db-bound.yaml", short());
-    let md = tempdes::report::markdown::render_run(&r, false);
-    assert!(md.starts_with("# tempdes: "), "{md}");
+    let md = durable_envision::report::markdown::render_run(&r, false);
+    assert!(md.starts_with("# Durable Envision: "), "{md}");
     for section in [
         "## Hotspots",
         "## Workflows",
@@ -1816,7 +1816,7 @@ fn child_starts_read_their_initiated_events_through_the_events_cache() {
       - activity: { duration: 50ms }";
     let at = |payload: &str| {
         let mut sc = payloads(payload, children, "");
-        sc.workflows[0].start_rate = Some(tempdes::util::units::Rate(10.0));
+        sc.workflows[0].start_rate = Some(durable_envision::util::units::Rate(10.0));
         simulate_scenario(&sc, Overrides::default())
     };
     let (small, large) = (at("1KiB"), at("200KiB"));
@@ -1857,7 +1857,7 @@ fn histories_over_the_size_limit_are_terminated() {
     // at 10 orders/s, so the cluster keeps up with their twenty workflow tasks
     let slower = |sc: Scenario| {
         let mut sc = sc;
-        sc.workflows[0].start_rate = Some(tempdes::util::units::Rate(10.0));
+        sc.workflows[0].start_rate = Some(durable_envision::util::units::Rate(10.0));
         sc
     };
     let r = simulate_scenario(
@@ -2173,13 +2173,16 @@ fn calibration_scales_each_start_call_on_its_own() {
     let mut sc = with_start("start", 0.0, "{}", "[ { timer: 1s } ]");
     let mut signal = sc.workflows[0].clone();
     signal.type_name = "InboxWorkflow".into();
-    signal.start_with = tempdes::config::scenario::StartWith::Signal;
+    signal.start_with = durable_envision::config::scenario::StartWith::Signal;
     let mut update = sc.workflows[0].clone();
     update.type_name = "EntityWorkflow".into();
-    update.start_with = tempdes::config::scenario::StartWith::Update;
+    update.start_with = durable_envision::config::scenario::StartWith::Update;
     sc.workflows.push(signal);
     sc.workflows.push(update);
-    let dir = std::env::temp_dir().join(format!("tempdes-with-start-{}", std::process::id()));
+    let dir = std::env::temp_dir().join(format!(
+        "durable-envision-with-start-{}",
+        std::process::id()
+    ));
     std::fs::create_dir_all(&dir).unwrap();
     let observed = dir.join("observed.yaml");
     std::fs::write(

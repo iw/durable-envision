@@ -1,6 +1,6 @@
-//! `tempdes workload fetch` against a stand-in Temporal frontend HTTP API: it lists the window's
-//! executions page by page, fetches histories page by page with the profile's credentials, drops
-//! their payloads, and leaves a directory that `workload import` reads, start rates and all.
+//! `durable-envision workload fetch` against a stand-in Temporal frontend HTTP API: it lists the
+//! window's executions page by page, fetches histories page by page with the profile's credentials,
+//! drops their payloads, and leaves a directory that `workload import` reads, start rates and all.
 
 #![cfg(feature = "fetch")]
 
@@ -11,10 +11,10 @@ use std::path::{Path, PathBuf};
 use std::sync::{Arc, Mutex};
 use std::time::{Duration, Instant};
 
+use durable_envision::envconfig::{Choice, Loaded, load_with};
+use durable_envision::histories::fetch::{Cli, FetchArgs, Pace, Via, fetch};
+use durable_envision::histories::{Options, import, read_manifest};
 use serde_json::{Value, json};
-use tempdes::envconfig::{Choice, Loaded, load_with};
-use tempdes::histories::fetch::{Cli, FetchArgs, Pace, Via, fetch};
-use tempdes::histories::{Options, import, read_manifest};
 
 /// A payload as the frontend sends it with `noPayloadShorthand`: `{"card":"4111"}`.
 const SECRET: &str = "eyJjYXJkIjoiNDExMSJ9";
@@ -358,7 +358,10 @@ fn stand_in(mut trouble: Trouble) -> (String, Arc<Mutex<Vec<Request>>>) {
 }
 
 fn fresh_dir(name: &str) -> PathBuf {
-    let dir = std::env::temp_dir().join(format!("tempdes-wfetch-{name}-{}", std::process::id()));
+    let dir = std::env::temp_dir().join(format!(
+        "durable-envision-wfetch-{name}-{}",
+        std::process::id()
+    ));
     let _ = std::fs::remove_dir_all(&dir);
     dir
 }
@@ -899,15 +902,15 @@ fn with_a_profile_histories_go_into_its_workload_folder() {
     let base = fresh_dir("cli-profile");
     let program = fake_cli(&base.join("bin"));
     let store = base.join("store");
-    let tempdes = |args: &[&str]| {
-        std::process::Command::new(env!("CARGO_BIN_EXE_tempdes"))
+    let durable_envision = |args: &[&str]| {
+        std::process::Command::new(env!("CARGO_BIN_EXE_durable-envision"))
             .args(args)
-            .env("TEMPDES_PROFILES", &store)
+            .env("DURABLE_ENVISION_PROFILES", &store)
             .output()
             .unwrap()
     };
-    assert!(tempdes(&["profile", "init", "p"]).status.success());
-    let out = tempdes(&[
+    assert!(durable_envision(&["profile", "init", "p"]).status.success());
+    let out = durable_envision(&[
         "workload",
         "fetch",
         "--profile",
@@ -932,7 +935,7 @@ fn with_a_profile_histories_go_into_its_workload_folder() {
     assert!(histories.join("fetch.yaml").is_file());
     assert!(histories.join("r-o1.json").is_file());
     // import finds them there, and writes beside them
-    let out = tempdes(&[
+    let out = durable_envision(&[
         "workload",
         "import",
         "--profile",
@@ -970,7 +973,7 @@ fn with_a_profile_histories_go_into_its_workload_folder() {
             "15m",
         ];
         args.extend_from_slice(extra);
-        tempdes(&args)
+        durable_envision(&args)
     };
     let out = fetch_period(&[]);
     let stderr = String::from_utf8_lossy(&out.stderr);
@@ -981,14 +984,14 @@ fn with_a_profile_histories_go_into_its_workload_folder() {
     );
     assert!(
         stderr.contains(&format!(
-            "next: tempdes workload import --profile p --period {period} --namespace"
+            "next: durable-envision workload import --profile p --period {period} --namespace"
         )),
         "{stderr}"
     );
     let folder = store.join("p/workload").join(period);
     assert!(folder.join("histories/r-o1.json").is_file());
     let import = || {
-        tempdes(&[
+        durable_envision(&[
             "workload",
             "import",
             "--profile",
@@ -1024,7 +1027,7 @@ fn with_a_profile_histories_go_into_its_workload_folder() {
         ),
     )
     .unwrap();
-    let out = tempdes(&["profile", "show", "p"]);
+    let out = durable_envision(&["profile", "show", "p"]);
     let stdout = String::from_utf8_lossy(&out.stdout);
     assert!(
         stdout
@@ -1032,7 +1035,7 @@ fn with_a_profile_histories_go_into_its_workload_folder() {
             .any(|l| l.contains("reads") && l.ends_with(&format!("{period}{}workflows.yaml", '/'))),
         "{stdout}"
     );
-    let out = tempdes(&["run", "--profile", "p"]);
+    let out = durable_envision(&["run", "--profile", "p"]);
     assert!(
         out.status.success(),
         "{}",
@@ -1053,7 +1056,7 @@ fn with_a_profile_histories_go_into_its_workload_folder() {
         String::from_utf8_lossy(&out.stderr)
     );
     for bad in ["../elsewhere", "histories"] {
-        let out = tempdes(&["workload", "import", "--profile", "p", "--period", bad]);
+        let out = durable_envision(&["workload", "import", "--profile", "p", "--period", bad]);
         assert!(!out.status.success(), "{bad}");
     }
 }

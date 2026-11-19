@@ -32,7 +32,7 @@
 //! `TEMPORAL_TLS_SERVER_NAME`, `TEMPORAL_TLS_DISABLE_HOST_VERIFICATION`, and
 //! `TEMPORAL_GRPC_META_<NAME>` for each header (`TEMPORAL_GRPC_META_MY_KEY` is `my-key`; an
 //! empty value removes it). The `codec` table and variables are for tools that decode payloads.
-//! tempdes never decodes them, so it ignores those.
+//! Durable Envision never decodes them, so it ignores those.
 
 use std::collections::BTreeMap;
 use std::path::PathBuf;
@@ -432,8 +432,10 @@ mod tests {
 
     /// A config file in a fresh directory.
     fn file(name: &str, text: &str) -> PathBuf {
-        let dir =
-            std::env::temp_dir().join(format!("tempdes-envconfig-{name}-{}", std::process::id()));
+        let dir = std::env::temp_dir().join(format!(
+            "durable-envision-envconfig-{name}-{}",
+            std::process::id()
+        ));
         std::fs::create_dir_all(&dir).unwrap();
         let f = dir.join("temporal.toml");
         std::fs::write(&f, text).unwrap();
@@ -555,7 +557,7 @@ endpoint = "http://localhost:8080"
 
     #[test]
     fn missing_files_are_empty_unless_named_on_the_command_line() {
-        let missing = std::env::temp_dir().join("tempdes-envconfig-none/temporal.toml");
+        let missing = std::env::temp_dir().join("durable-envision-envconfig-none/temporal.toml");
         let l = load_with(
             &Choice::default(),
             &env(&[("TEMPORAL_CONFIG_FILE", missing.to_str().unwrap())]),

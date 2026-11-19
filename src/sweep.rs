@@ -521,7 +521,7 @@ pub(crate) fn top_hotspot(c: &Cell) -> String {
 pub fn render_text(r: &SweepResult) -> String {
     let mut o = String::new();
     o.push_str(&format!(
-        "\ntempdes sweep · Temporal {} · {} · {} cells in {:.1}s{}\n",
+        "\nDurable Envision sweep · Temporal {} · {} · {} cells in {:.1}s{}\n",
         r.temporal_version,
         r.scenario,
         r.cells.len(),

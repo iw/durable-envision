@@ -1,5 +1,5 @@
-//! End-to-end checks of `tempdes ui`: frames describe the simulated cluster, live changes take
-//! effect on the running simulation, and the Topcoat routes respond.
+//! End-to-end checks of `durable-envision ui`: frames describe the simulated cluster, live changes
+//! take effect on the running simulation, and the Topcoat routes respond.
 
 #![cfg(feature = "ui")]
 
@@ -7,15 +7,15 @@ use std::path::Path;
 use std::sync::Arc;
 use std::time::{Duration, Instant};
 
-use tempdes::config::dynamic::DcValue;
-use tempdes::config::scenario::Scenario;
-use tempdes::model::build;
-use tempdes::model::params::Params;
-use tempdes::model::types::Service;
-use tempdes::run::{self, Overrides};
-use tempdes::ui::app::{self, ControlRequest, parse_control};
-use tempdes::ui::engine::{Command, Engine, Options};
-use tempdes::ui::frame::{AnalysisSummary, FLOWS, Frame, Meta, Phase, Sampler};
+use durable_envision::config::dynamic::DcValue;
+use durable_envision::config::scenario::Scenario;
+use durable_envision::model::build;
+use durable_envision::model::params::Params;
+use durable_envision::model::types::Service;
+use durable_envision::run::{self, Overrides};
+use durable_envision::ui::app::{self, ControlRequest, parse_control};
+use durable_envision::ui::engine::{Command, Engine, Options};
+use durable_envision::ui::frame::{AnalysisSummary, FLOWS, Frame, Meta, Phase, Sampler};
 use topcoat::router::request::Request;
 use topcoat::router::{Body, Method, StatusCode, header, to_bytes};
 

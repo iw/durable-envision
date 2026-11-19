@@ -7,7 +7,7 @@
 #   proxy        the load balancer adds them after registration and health checks
 # The warm-up ends at the scale-out, so the report covers the two minutes after it:
 #
-#   tempdes sweep examples/scenarios/frontend-scale-out.yaml --rows frontend=3 \
+#   durable-envision sweep examples/scenarios/frontend-scale-out.yaml --rows frontend=3 \
 #       --cols client_lb=pinned,round_robin,proxy --cols frontend.keepAliveMaxConnectionAge=5m,1m
 name: frontend-scale-out
 description: >

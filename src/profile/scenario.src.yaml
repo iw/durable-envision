@@ -1,6 +1,7 @@
-# tempdes scenario for profile __NAME__: a Temporal cluster and the load it runs, written by
-# `tempdes profile init` as an example to edit. `tempdes run --profile __NAME__` simulates it,
-# with the options in profile.yaml beside it.
+# Durable Envision scenario for profile __NAME__: a Temporal cluster and the load it runs,
+# written by `durable-envision profile init` as an example to edit.
+# `durable-envision run --profile __NAME__` simulates it, with the options in profile.yaml
+# beside it.
 #
 # Units: durations "500us", "2ms", "1.5s", "5m", "2h" (a bare number is seconds); rates
 # "120/s", "3000/min", "10/h"; sizes "512", "4KiB", "2MiB". A duration distribution is one
@@ -79,9 +80,10 @@ cluster:
     bulk_latency: { p50: 20ms, p99: 120ms }   # Elasticsearch bulk requests
 #}off
 
-# The cluster's dynamic config, in Temporal's own format: files first, then values inline,
-# which win. A value with constraints applies where they match, over the unconstrained one.
-# `tempdes dc search`, `dc explain` and `dc modeled` list the keys and what the simulator uses.
+# The cluster's dynamic config, in Temporal's own format: files first, then values inline, which
+# win. A value with constraints applies where they match, over the unconstrained one.
+# `durable-envision dc search`, `dc explain` and `dc modeled` list the keys and what the simulator
+# uses.
 #{off
 dynamic_config_files:
   - dynamicconfig.yaml
@@ -131,11 +133,11 @@ workers:
     processes: 2
 #}off
 
-# The workflow types and their steps. `tempdes workload fetch --profile __NAME__` fetches
-# histories into workload/histories, and `tempdes workload import --profile __NAME__` infers
-# workflow types from them into workload/workflows.yaml. To use those, name the file, or the
-# folder it is in, in place of these entries: `workflows: workload`. With --period PERIOD,
-# both commands use workload/PERIOD instead: `workflows: workload/PERIOD`.
+# The workflow types and their steps. `durable-envision workload fetch --profile __NAME__` fetches
+# histories into workload/histories, and `durable-envision workload import --profile __NAME__`
+# infers workflow types from them into workload/workflows.yaml. To use those, name the file, or the
+# folder it is in, in place of these entries: `workflows: workload`. With --period PERIOD, both
+# commands use workload/PERIOD instead: `workflows: workload/PERIOD`.
 workflows:
   - type: OrderWorkflow
     namespace: orders                 # default: default

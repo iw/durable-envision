@@ -2,27 +2,27 @@
 
 ## Supported versions
 
-tempdes is pre-1.0 and has no releases yet. Security fixes land on the `main` branch.
+Durable Envision is pre-1.0 and has no releases yet. Security fixes land on the `main` branch.
 
 ## Reporting a vulnerability
 
 Please don't report security problems in public issues. Use GitHub's
-[private vulnerability reporting](https://github.com/iw/tempdes/security/advisories/new)
+[private vulnerability reporting](https://github.com/iw/durable-envision/security/advisories/new)
 instead: go to the **Security** tab and choose **Report a vulnerability**.
 
 Please include:
 
 * what the problem is and what an attacker could do with it;
 * the steps or input files to reproduce it;
-* the tempdes version or commit you used.
+* the Durable Envision version or commit you used.
 
 The maintainer will acknowledge your report as soon as possible, and will keep you informed
 while working on a fix and advisory.
 
 ## Scope
 
-tempdes runs offline. It reads the scenario, dynamic config, Helm values and metrics files you
-give it, and writes reports. It doesn't connect to Temporal, Kubernetes or the network.
+Durable Envision runs offline. It reads the scenario, dynamic config, Helm values and metrics files
+you give it, and writes reports. It doesn't connect to Temporal, Kubernetes or the network.
 
 These count as security issues:
 

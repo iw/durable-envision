@@ -1,7 +1,7 @@
 # Baseline: an order-processing workload on a modest EKS deployment.
 #
-#   tempdes run examples/scenarios/baseline.yaml
-#   tempdes sweep examples/scenarios/baseline.yaml \
+#   durable-envision run examples/scenarios/baseline.yaml
+#   durable-envision sweep examples/scenarios/baseline.yaml \
 #       --rows history=3,6,9 --cols history.shardIOConcurrency=1,2,4
 name: orders-baseline
 description: >

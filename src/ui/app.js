@@ -1,4 +1,4 @@
-// tempdes live view. The server renders every number once; this script keeps the page in
+// Durable Envision live view. The server renders every number once; this script keeps the page in
 // step with the simulation: it applies each frame from the event stream to the elements the
 // server tagged (data-bind, data-bar, data-heat, data-vbar, data-svgw, data-width,
 // data-show, data-alarm), draws the charts and the shard map, and posts control changes.

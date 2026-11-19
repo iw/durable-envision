@@ -143,7 +143,7 @@ pub fn render(r: &RunResult, verbose: bool) -> String {
         o,
         "\n{}  {}",
         st.bold(&format!(
-            "tempdes · Temporal {} · {}",
+            "Durable Envision · Temporal {} · {}",
             r.temporal_version, r.scenario
         )),
         st.dim(&r.label)

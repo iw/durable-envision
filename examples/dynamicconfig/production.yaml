@@ -1,6 +1,6 @@
 # A production-style Temporal dynamic config (the file mounted at
 # /etc/temporal/config/dynamicconfig/*.yaml or the Helm chart's server.dynamicConfig block).
-# Validate it with:  tempdes dc validate examples/dynamicconfig/production.yaml
+# Validate it with:  durable-envision dc validate examples/dynamicconfig/production.yaml
 
 frontend.rps:
   - value: 6000

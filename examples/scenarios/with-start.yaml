@@ -3,8 +3,8 @@
 # call waits out history.longPollExpirationInterval (20s) and is sent again: the waiting calls
 # are long-running requests, and they fill frontend.namespaceCount on every frontend.
 #
-#   tempdes run examples/scenarios/with-start.yaml
-#   tempdes sweep examples/scenarios/with-start.yaml \
+#   durable-envision run examples/scenarios/with-start.yaml
+#   durable-envision sweep examples/scenarios/with-start.yaml \
 #       --rows worker=1 --cols frontend.namespaceCount=1200,4000
 name: carts-with-start
 description: >

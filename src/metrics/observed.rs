@@ -3,7 +3,7 @@
 //! Three ways to provide them:
 //! 1. A YAML observations file where each entry names a Temporal metric, a label filter and a
 //!    value (rate, gauge value, quantiles or raw histogram buckets). Typically filled in from
-//!    Grafana / PromQL (`tempdes metrics queries` prints the queries).
+//!    Grafana / PromQL (`durable-envision metrics queries` prints the queries).
 //! 2. One Prometheus scrape (`/metrics` text). Histograms are usable directly (cumulative since
 //!    process start); counters need a second scrape.
 //! 3. Two Prometheus scrapes plus the time between them: counters become rates.
@@ -254,7 +254,7 @@ impl Observations {
                     );
                 }
                 // a single file whose counters are increases over `interval` (e.g. the output of
-                // `tempdes run --prom` or a recording of `increase(...[interval])`)
+                // `durable-envision run --prom` or a recording of `increase(...[interval])`)
                 None => o.ingest_scrape(&after, p.interval.map(|i| i.secs()), &p.after),
             }
         }
@@ -604,7 +604,7 @@ mod tests {
 
     #[test]
     fn yaml_observations() {
-        let dir = std::env::temp_dir().join(format!("tempdes-obs-{}", std::process::id()));
+        let dir = std::env::temp_dir().join(format!("durable-envision-obs-{}", std::process::id()));
         std::fs::create_dir_all(&dir).unwrap();
         let p = dir.join("obs.yaml");
         std::fs::write(
