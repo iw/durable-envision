@@ -12,11 +12,11 @@ use std::process::ExitCode;
 use anyhow::Context;
 use clap::Parser;
 
-use tempdes::config::dynamic::RegistryFile;
-use tempdes::config::registry_gen;
+use durable_envision::config::dynamic::RegistryFile;
+use durable_envision::config::registry_gen;
 
-/// Generate tempdes' dynamic config registry (every setting's key, scope, type, default and
-/// description) from a Temporal server source checkout.
+/// Generate Durable Envision's dynamic config registry (every setting's key, scope, type, default
+/// and description) from a Temporal server source checkout.
 #[derive(Parser)]
 #[command(name = "gen-dc-registry", version)]
 struct Args {

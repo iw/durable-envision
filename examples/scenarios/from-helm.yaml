@@ -1,6 +1,6 @@
 # Deployment taken from a Helm values file; only the workload and database capacity are
 # described here. CLI overrides still apply:
-#   tempdes run examples/scenarios/from-helm.yaml -r history=8
+#   durable-envision run examples/scenarios/from-helm.yaml -r history=8
 name: orders-from-helm
 seed: 17
 warmup: 20s

@@ -171,7 +171,7 @@ pub async fn document(d: &PageData) -> Result<impl View> {
             <head>
                 <meta charset="utf-8">
                 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-                <title>(format!("{} · tempdes live", d.params.name))</title>
+                <title>(format!("{} · Durable Envision live", d.params.name))</title>
                 <link rel="icon" href="data:,">
                 topcoat::font::link(font: super::app::SANS)
                 topcoat::font::link(font: super::app::MONO)
@@ -239,7 +239,7 @@ pub async fn document(d: &PageData) -> Result<impl View> {
                         </ul>
                     </section>
                     <footer>
-                        "tempdes · Temporal "(d.temporal_version.clone())" model · "
+                        "Durable Envision · Temporal "(d.temporal_version.clone())" model · "
                         (format!("{} history shards · {} · client LB {} · seed {}", d.params.num_shards, format!("{:?}", d.params.store).to_ascii_lowercase(), d.params.client_lb.as_str(), d.params.seed))
                         " · rendered by Topcoat; live values over server-sent events"
                     </footer>

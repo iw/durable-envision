@@ -77,7 +77,7 @@ pub fn build(traces: &[Trace], opts: &Options) -> Program {
     });
     let _ = writeln!(
         yaml,
-        "# Imported by `tempdes workload import` from {} histories started over {}.\n\
+        "# Imported by `durable-envision workload import` from {} histories started over {}.\n\
          # Payloads were not read; payload_bytes comes from the history sizes the server\n\
          # recorded. Durations are each step's own time, without waits in the cluster.\n#",
         traces.len(),
@@ -249,7 +249,7 @@ fn fleets_summary(fleets: &BTreeMap<&str, Fleet<'_>>, span_us: f64, summary: &mu
     if shared > 0 {
         let _ = writeln!(
             summary,
-            "  note: {shared} process{} ran tasks from more than one task queue, and count in each fleet: tempdes runs a fleet per task queue",
+            "  note: {shared} process{} ran tasks from more than one task queue, and count in each fleet: Durable Envision runs a fleet per task queue",
             if shared == 1 { "" } else { "es" }
         );
     }
@@ -261,7 +261,7 @@ fn fleets_summary(fleets: &BTreeMap<&str, Fleet<'_>>, span_us: f64, summary: &mu
     if !others.is_empty() {
         let _ = writeln!(
             summary,
-            "  note: workers report {}: tempdes follows the Go SDK's pollers and sticky cache, which other SDKs handle differently in detail",
+            "  note: workers report {}: Durable Envision follows the Go SDK's pollers and sticky cache, which other SDKs handle differently in detail",
             others.into_iter().collect::<Vec<_>>().join(", ")
         );
     }

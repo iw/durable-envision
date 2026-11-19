@@ -113,7 +113,7 @@ pub fn render_as(ctx: &Ctx, reading: Reading) -> String {
         Reading::Window => {
             let _ = writeln!(
                 w.out,
-                "# tempdes simulated metrics (Temporal {} naming) scenario={} window_seconds={}",
+                "# Durable Envision simulated metrics (Temporal {} naming) scenario={} window_seconds={}",
                 crate::config::dynamic::registry().temporal_version,
                 p.name,
                 p.duration as f64 / 1e6
@@ -126,7 +126,7 @@ pub fn render_as(ctx: &Ctx, reading: Reading) -> String {
         Reading::Scrape => {
             let _ = writeln!(
                 w.out,
-                "# tempdes simulated metrics (Temporal {} naming) scenario={} scraped_at_seconds={}",
+                "# Durable Envision simulated metrics (Temporal {} naming) scenario={} scraped_at_seconds={}",
                 crate::config::dynamic::registry().temporal_version,
                 p.name,
                 crate::sim::executor::now() as f64 / 1e6
@@ -213,7 +213,7 @@ pub fn render_as(ctx: &Ctx, reading: Reading) -> String {
             }
         }
         w.gauge(
-            "tempdes_pod_cpu_utilization",
+            "durable_envision_pod_cpu_utilization",
             &[("service_name", svc.clone()), ("instance", inst.clone())],
             pod.cpu.utilization(),
         );
@@ -491,7 +491,7 @@ pub fn render_as(ctx: &Ctx, reading: Reading) -> String {
     }
     // database (not a Temporal metric)
     w.gauge(
-        "tempdes_database_utilization",
+        "durable_envision_database_utilization",
         &[],
         ctx.db.borrow().servers.utilization(),
     );

@@ -11,7 +11,7 @@ use crate::run::{self, Overrides};
 
 #[derive(Parser)]
 #[command(
-    name = "tempdes",
+    name = "durable-envision",
     version,
     about = "Discrete-event simulator that surfaces hotspots in Temporal 1.31.0 clusters on EKS",
     long_about = None
@@ -185,7 +185,7 @@ struct ImportArgs {
 /// When profile `name` doesn't read the observations in `file` yet, say how to make it.
 #[cfg(feature = "fetch")]
 fn observed_hint(name: &str, file: &std::path::Path) {
-    let Ok(entry) = profile::Store::open().and_then(|s| s.load(name)) else {
+    let Ok(entry) = open_store().and_then(|s| s.load(name)) else {
         return;
     };
     let listed = entry
@@ -209,13 +209,25 @@ fn observed_hint(name: &str, file: &std::path::Path) {
     }
 }
 
+/// The profile store at its default location. The first time, it says so when the profiles are
+/// still where the store was under the tool's former name.
+fn open_store() -> anyhow::Result<profile::Store> {
+    static NOTED: std::sync::Once = std::sync::Once::new();
+    NOTED.call_once(|| {
+        if let Some(note) = profile::former_store_note(|k| std::env::var_os(k).map(PathBuf::from)) {
+            eprintln!("note: {note}");
+        }
+    });
+    profile::Store::open()
+}
+
 /// The folder in profile `name` where its fetched and imported files go (`metrics` or
 /// `workload`), or the folder of `period` in it, created private if it isn't there yet.
 fn profile_area(name: &str, sub: &str, period: Option<&str>) -> anyhow::Result<PathBuf> {
     if let Some(p) = period {
         profile::check_period(p)?;
     }
-    let mut dir = profile::Store::open()?.folder(name)?.join(sub);
+    let mut dir = open_store()?.folder(name)?.join(sub);
     profile::create_private_dir(&dir)?;
     if let Some(p) = period {
         dir.push(p);
@@ -260,7 +272,7 @@ fn relative_to(folder: &std::path::Path, file: &std::path::Path) -> String {
 /// When the scenario of profile `name` doesn't take its workflows from `file` yet, say how to
 /// make it.
 fn workflows_hint(name: &str, file: &std::path::Path) {
-    let Ok(entry) = profile::Store::open().and_then(|s| s.load(name)) else {
+    let Ok(entry) = open_store().and_then(|s| s.load(name)) else {
         return;
     };
     let Ok(sc) = entry.spec.load_scenario() else {
@@ -292,7 +304,7 @@ pub struct CommonArgs {
     /// Scenario file (YAML).
     #[arg(required_unless_present = "profile", conflicts_with = "profile")]
     scenario: Option<PathBuf>,
-    /// Run a saved profile (`tempdes profile list`); the options given here apply on top.
+    /// Run a saved profile (`durable-envision profile list`); the options given here apply on top.
     #[arg(long, value_name = "NAME")]
     profile: Option<String>,
     /// Override replica counts: `history=6` (repeatable).
@@ -396,7 +408,7 @@ struct UiArgs {
 #[derive(Subcommand)]
 enum ProfileCmd {
     /// Save a scenario and run options under a name, e.g.
-    /// `tempdes profile save prod cluster.yaml -r history=4 -o observed.yaml`.
+    /// `durable-envision profile save prod cluster.yaml -r history=4 -o observed.yaml`.
     /// With `--profile BASE` instead of a scenario, the new profile starts from BASE.
     Save(Box<SaveArgs>),
     /// Start a profile from a commented prototype: a profile.yaml and a scenario.yaml to edit,
@@ -596,7 +608,7 @@ fn options(c: &CommonArgs) -> RunOptions {
 pub fn run_spec(c: &CommonArgs) -> anyhow::Result<RunSpec> {
     let mut spec = match (&c.profile, &c.scenario) {
         (Some(name), _) => {
-            let entry = profile::Store::open()?.load(name)?;
+            let entry = open_store()?.load(name)?;
             eprintln!("using profile {name} ({})", entry.path.display());
             entry.spec
         }
@@ -777,13 +789,13 @@ fn cmd_workload_fetch(a: WorkloadFetchArgs) -> anyhow::Result<ExitCode> {
     };
     let next = match &a.profile {
         Some(name) if found => format!(
-            "tempdes workload import --profile {name}{} --namespace <namespace in your scenario>",
+            "durable-envision workload import --profile {name}{} --namespace <namespace in your scenario>",
             a.period
                 .as_ref()
                 .map_or(String::new(), |p| format!(" --period {p}"))
         ),
         _ => format!(
-            "tempdes workload import {} --namespace <namespace in your scenario> -o workflows.yaml",
+            "durable-envision workload import {} --namespace <namespace in your scenario> -o workflows.yaml",
             output.display()
         ),
     };
@@ -944,7 +956,7 @@ fn cmd_run(a: RunArgs) -> anyhow::Result<ExitCode> {
 }
 
 fn cmd_profile(cmd: ProfileCmd) -> anyhow::Result<ExitCode> {
-    let store = profile::Store::open()?;
+    let store = open_store()?;
     match cmd {
         ProfileCmd::Save(a) => {
             let spec = run_spec(&a.common)?;
@@ -972,7 +984,7 @@ fn cmd_profile(cmd: ProfileCmd) -> anyhow::Result<ExitCode> {
                     );
                 }
             }
-            println!("run it with: tempdes run --profile {}", a.name);
+            println!("run it with: durable-envision run --profile {}", a.name);
         }
         ProfileCmd::Init { name, description } => {
             let dir = store.init(&name, description.as_deref())?;
@@ -985,11 +997,13 @@ fn cmd_profile(cmd: ProfileCmd) -> anyhow::Result<ExitCode> {
                 ),
                 (
                     format!("{}/", profile::METRICS_DIR),
-                    format!("what `tempdes metrics fetch --profile {name}` writes"),
+                    format!("what `durable-envision metrics fetch --profile {name}` writes"),
                 ),
                 (
                     format!("{}/", profile::WORKLOAD_DIR),
-                    format!("what `tempdes workload fetch` and `import --profile {name}` write"),
+                    format!(
+                        "what `durable-envision workload fetch` and `import --profile {name}` write"
+                    ),
                 ),
             ] {
                 println!("  {file:<15}{what}");
@@ -1000,8 +1014,8 @@ fn cmd_profile(cmd: ProfileCmd) -> anyhow::Result<ExitCode> {
                     root.display()
                 );
             }
-            println!("check it with: tempdes profile show {name}");
-            println!("run it with:   tempdes run --profile {name}");
+            println!("check it with: durable-envision profile show {name}");
+            println!("run it with:   durable-envision run --profile {name}");
         }
         ProfileCmd::List => {
             let profiles = store.list()?;

@@ -397,6 +397,23 @@ dependencies = [
 ]
 
 [[package]]
+name = "durable-envision"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "clap",
+ "futures-util",
+ "rustls",
+ "serde",
+ "serde-saphyr",
+ "serde_json",
+ "tokio",
+ "toml",
+ "topcoat",
+ "ureq",
+]
+
+[[package]]
 name = "elsa"
 version = "1.11.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1671,23 +1688,6 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn 3.0.6",
-]
-
-[[package]]
-name = "tempdes"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "clap",
- "futures-util",
- "rustls",
- "serde",
- "serde-saphyr",
- "serde_json",
- "tokio",
- "toml",
- "topcoat",
- "ureq",
 ]
 
 [[package]]

@@ -1,4 +1,4 @@
-//! The simulation thread behind `tempdes ui`.
+//! The simulation thread behind `durable-envision ui`.
 //!
 //! The simulator is single-threaded (`Rc<Sim>`), so one dedicated thread owns the built
 //! cluster and its executor, advances simulated time in slices, and between slices applies the
@@ -157,7 +157,7 @@ impl Engine {
             params: Arc::new(params.clone()),
         });
         thread::Builder::new()
-            .name("tempdes-sim".into())
+            .name("durable-envision-sim".into())
             .spawn(move || run_loop(params, opts, &cmd_rx, &frame_tx, &shared, &ready_tx))?;
         ready_rx
             .recv()

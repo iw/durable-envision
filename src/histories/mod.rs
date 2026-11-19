@@ -1,4 +1,4 @@
-//! Workloads from exported workflow histories (`tempdes workload fetch` and `import`).
+//! Workloads from exported workflow histories (`durable-envision workload fetch` and `import`).
 //!
 //! Reads histories as the Temporal CLI, Web UI and tctl export them, or as `workload fetch`
 //! writes them ([`fetch`]), turns each into a sequence of steps ([`trace`]), and pools executions

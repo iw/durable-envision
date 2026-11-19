@@ -4,7 +4,7 @@
 # NLB), the pod that happens to hold the busiest connections throttles polls while the
 # others still have room. Compare the three modes:
 #
-#   tempdes sweep examples/scenarios/frontend-lb.yaml --rows frontend=3,4 \
+#   durable-envision sweep examples/scenarios/frontend-lb.yaml --rows frontend=3,4 \
 #       --cols client_lb=pinned,round_robin,proxy
 #
 # docs/EKS.md walks through the results and an EKS setup for each mode.

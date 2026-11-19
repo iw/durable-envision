@@ -1,4 +1,4 @@
-//! `tempdes metrics …` — help collecting observed Temporal metrics for calibration.
+//! `durable-envision metrics …` — help collecting observed Temporal metrics for calibration.
 
 use std::path::PathBuf;
 use std::process::ExitCode;
@@ -166,7 +166,7 @@ pub const SPECS: &[Spec] = &[
         by: "namespace",
         filter: "",
         fixed: &[],
-        what: "completed workflows per namespace (not read by tempdes)",
+        what: "completed workflows per namespace (not read by Durable Envision)",
     },
     Spec {
         name: "workflow_context_cleared",
@@ -174,7 +174,7 @@ pub const SPECS: &[Spec] = &[
         by: "",
         filter: "",
         fixed: &[],
-        what: "mutable state cleared after errors, twice per failed write (not read by tempdes)",
+        what: "mutable state cleared after errors, twice per failed write (not read by Durable Envision)",
     },
     Spec {
         name: "cache_latency",
@@ -182,7 +182,7 @@ pub const SPECS: &[Spec] = &[
         by: "operation",
         filter: r#"cache_type="mutablestate""#,
         fixed: &[("cache_type", "mutablestate")],
-        what: "getting a workflow from history's cache, which waits for its lock (not read by tempdes)",
+        what: "getting a workflow from history's cache, which waits for its lock (not read by Durable Envision)",
     },
     Spec {
         name: "shard_closed_count",
@@ -190,7 +190,7 @@ pub const SPECS: &[Spec] = &[
         by: "",
         filter: "",
         fixed: &[],
-        what: "history shards closed, as when they move between pods (not read by tempdes)",
+        what: "history shards closed, as when they move between pods (not read by Durable Envision)",
     },
     Spec {
         name: "syncmatch_latency",
@@ -198,7 +198,7 @@ pub const SPECS: &[Spec] = &[
         by: "namespace, operation",
         filter: "",
         fixed: &[],
-        what: "AddActivityTask / AddWorkflowTask for tasks handed straight to a poller, the start record included (not read by tempdes)",
+        what: "AddActivityTask / AddWorkflowTask for tasks handed straight to a poller, the start record included (not read by Durable Envision)",
     },
     Spec {
         name: "approximate_backlog_age_seconds",
@@ -206,7 +206,7 @@ pub const SPECS: &[Spec] = &[
         by: "namespace, task_type",
         filter: "",
         fixed: &[],
-        what: "oldest backlog task's age, largest in the window, against matching.backlogNegligibleAge (not read by tempdes)",
+        what: "oldest backlog task's age, largest in the window, against matching.backlogNegligibleAge (not read by Durable Envision)",
     },
     Spec {
         name: "task_write_throttle_count",
@@ -214,7 +214,7 @@ pub const SPECS: &[Spec] = &[
         by: "",
         filter: "",
         fixed: &[],
-        what: "backlog appends refused with SystemOverloaded, against matching.outstandingTaskAppendsThreshold (not read by tempdes)",
+        what: "backlog appends refused with SystemOverloaded, against matching.outstandingTaskAppendsThreshold (not read by Durable Envision)",
     },
     Spec {
         name: "temporal_num_pollers",
@@ -222,7 +222,7 @@ pub const SPECS: &[Spec] = &[
         by: "namespace, poller_type",
         filter: "",
         fixed: &[],
-        what: "concurrent worker pollers, from the SDKs (not read by tempdes)",
+        what: "concurrent worker pollers, from the SDKs (not read by Durable Envision)",
     },
 ];
 
@@ -314,8 +314,8 @@ impl Spec {
     }
 }
 
-const TEMPLATE: &str = r#"# tempdes observations file
-# Values read from your Temporal Prometheus metrics (see `tempdes metrics queries`).
+const TEMPLATE: &str = r#"# Durable Envision observations file
+# Values read from your Temporal Prometheus metrics (see `durable-envision metrics queries`).
 # Metric names are Temporal's; `temporal_` prefixes and `_total` / `_milliseconds` suffixes are
 # accepted and stripped. Label filters are subset matches.
 description: production, weekday peak
@@ -379,11 +379,13 @@ metrics:
 pub fn run(cmd: Cmd) -> anyhow::Result<ExitCode> {
     match cmd {
         Cmd::Queries { window } => {
-            println!("# PromQL for a tempdes observations file (window {window}).");
+            println!("# PromQL for a Durable Envision observations file (window {window}).");
             println!(
                 "# Record each result under `metrics:` with the given name and labels, or let"
             );
-            println!("# `tempdes metrics fetch` run them. Histograms are `<name>_bucket` here.\n");
+            println!(
+                "# `durable-envision metrics fetch` run them. Histograms are `<name>_bucket` here.\n"
+            );
             for s in SPECS {
                 let metric = match s.kind {
                     Kind::Histogram(_) => format!("{}_bucket", s.name),

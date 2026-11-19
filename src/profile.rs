@@ -6,29 +6,29 @@
 //! repository, one directory per profile:
 //!
 //! ```text
-//! ~/.config/tempdes/profiles/prod/
+//! ~/.config/durable-envision/profiles/prod/
 //!   profile.yaml         the run options
-//!   scenario.yaml        the scenario: a copy, or the one `tempdes profile init` wrote
-//!   metrics/             observed metrics: what `tempdes metrics fetch --profile prod` writes,
-//!                        observed.yaml, and in saved/ the copies `profile save` makes (with
-//!                        their scrape files)
-//!   workload/            what `tempdes workload fetch` and `import --profile prod` write:
+//!   scenario.yaml        the scenario: a copy, or the one `durable-envision profile init` wrote
+//!   metrics/             observed metrics: what `durable-envision metrics fetch --profile prod`
+//!                        writes, observed.yaml, and in saved/ the copies `profile save` makes
+//!                        (with their scrape files)
+//!   workload/            what `durable-envision workload fetch` and `import --profile prod` write:
 //!                        histories/ and workflows.yaml
 //! ```
 //!
 //! With `--period NAME`, those commands write a period's files in a folder of its own, such as
 //! `metrics/NAME/observed.yaml` and `workload/NAME/workflows.yaml`.
 //!
-//! `tempdes profile init` writes a profile to start from ([`template`]). A scenario file placed
-//! in the store as `<name>.yaml` is a profile too: the scenario is the whole run, and it has no
-//! folder for what is fetched.
+//! `durable-envision profile init` writes a profile to start from ([`template`]). A scenario file
+//! placed in the store as `<name>.yaml` is a profile too: the scenario is the whole run, and it
+//! has no folder for what is fetched.
 //!
-//! The store is `$TEMPDES_PROFILES`, else `$XDG_CONFIG_HOME/tempdes/profiles`, else
-//! `~/.config/tempdes/profiles` (`%APPDATA%\tempdes\profiles` on Windows). On Unix its
-//! directories are created `0700` and its files `0600`. Files the scenario itself refers to
-//! (Helm values, dynamic config files, workflows, calibration observations) resolve against
-//! the profile's folder, unless `profile.yaml` names another as `scenario_dir`. `profile save`
-//! doesn't copy them: when the scenario refers to any, it names the folder they are in.
+//! The store is `$DURABLE_ENVISION_PROFILES`, else `$XDG_CONFIG_HOME/durable-envision/profiles`,
+//! else `~/.config/durable-envision/profiles` (`%APPDATA%\durable-envision\profiles` on Windows).
+//! On Unix its directories are created `0700` and its files `0600`. Files the scenario itself
+//! refers to (Helm values, dynamic config files, workflows, calibration observations) resolve
+//! against the profile's folder, unless `profile.yaml` names another as `scenario_dir`. `profile
+//! save` doesn't copy them: when the scenario refers to any, it names the folder they are in.
 
 pub mod template;
 
@@ -252,7 +252,8 @@ pub struct Saved {
 /// How a profile is kept in the store.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Kind {
-    /// A directory written by `tempdes profile save`: the options, plus copies of the files.
+    /// A directory written by `durable-envision profile save`: the options, plus copies of the
+    /// files.
     Saved,
     /// A scenario file placed in the store as `<name>.yaml`: the scenario is the whole run.
     Scenario,
@@ -278,15 +279,15 @@ pub struct Store {
 /// The file inside each profile directory.
 const PROFILE_FILE: &str = "profile.yaml";
 
-/// Inside a profile's folder: the observed metrics, which `tempdes metrics fetch --profile`
-/// writes and `profile save` copies.
+/// Inside a profile's folder: the observed metrics, which `durable-envision metrics fetch
+/// --profile` writes and `profile save` copies.
 pub const METRICS_DIR: &str = "metrics";
 
 /// Inside [`METRICS_DIR`]: the copies `profile save` makes, one folder per observations file.
 pub const SAVED_DIR: &str = "saved";
 
 /// Inside a profile's folder: the histories and the workflows inferred from them, which
-/// `tempdes workload fetch` and `import --profile` write.
+/// `durable-envision workload fetch` and `import --profile` write.
 pub const WORKLOAD_DIR: &str = "workload";
 
 /// Inside [`WORKLOAD_DIR`], or a period's folder in it: the histories `workload fetch` writes.
@@ -296,8 +297,9 @@ impl Store {
     /// The store at its default location (see the module docs). Nothing is created until a
     /// profile is saved.
     pub fn open() -> anyhow::Result<Store> {
-        let dir = default_dir(|k| std::env::var_os(k).map(PathBuf::from))
-            .context("can't find a home directory for the profile store; set TEMPDES_PROFILES")?;
+        let dir = default_dir(|k| std::env::var_os(k).map(PathBuf::from)).context(
+            "can't find a home directory for the profile store; set DURABLE_ENVISION_PROFILES",
+        )?;
         Ok(Store { dir })
     }
 
@@ -338,7 +340,7 @@ impl Store {
     pub fn load(&self, name: &str) -> anyhow::Result<Entry> {
         let Some((kind, path)) = self.locate(name)? else {
             bail!(
-                "no profile {name:?} in {} (see `tempdes profile list`)",
+                "no profile {name:?} in {} (see `durable-envision profile list`)",
                 self.dir.display()
             );
         };
@@ -431,7 +433,7 @@ impl Store {
         let target = self.profile_dir(name)?;
         if let Some((Kind::Scenario, file)) = self.locate(name)? {
             bail!(
-                "{} already defines profile {name:?}; save under another name, for example `tempdes profile save {name}-2 --profile {name} ...`",
+                "{} already defines profile {name:?}; save under another name, for example `durable-envision profile save {name}-2 --profile {name} ...`",
                 file.display()
             );
         }
@@ -488,7 +490,7 @@ impl Store {
         let target = self.profile_dir(name)?;
         if let Some((_, path)) = self.locate(name)? {
             bail!(
-                "profile {name:?} already exists ({}); remove it with `tempdes profile remove {name}`, or choose another name",
+                "profile {name:?} already exists ({}); remove it with `durable-envision profile remove {name}`, or choose another name",
                 path.display()
             );
         }
@@ -530,11 +532,11 @@ impl Store {
             Some((Kind::Saved, dir)) => Ok(dir),
             Some((Kind::Scenario, file)) => bail!(
                 "profile {name:?} is the scenario file {}, with no folder for what is fetched; \
-                 give it one with `tempdes profile save {name}-2 --profile {name}`",
+                 give it one with `durable-envision profile save {name}-2 --profile {name}`",
                 file.display()
             ),
             None => bail!(
-                "no profile {name:?} in {}; `tempdes profile init {name}` starts one",
+                "no profile {name:?} in {}; `durable-envision profile init {name}` starts one",
                 self.dir.display()
             ),
         }
@@ -621,7 +623,7 @@ fn write_profile(
     let yaml =
         serde_saphyr::to_string(&profile).map_err(|e| anyhow::anyhow!("writing profile: {e}"))?;
     let text = format!(
-        "# tempdes run profile: private, keep it out of version control.\n# Run it with `tempdes run --profile <name>`.\n{yaml}"
+        "# Durable Envision run profile: private, keep it out of version control.\n# Run it with `durable-envision run --profile <name>`.\n{yaml}"
     );
     write_private(&dir.join(PROFILE_FILE), text.as_bytes())?;
     Ok(copied)
@@ -629,16 +631,43 @@ fn write_profile(
 
 /// The default store directory, given a way to read environment variables.
 pub fn default_dir(env: impl Fn(&str) -> Option<PathBuf>) -> Option<PathBuf> {
-    if let Some(d) = env("TEMPDES_PROFILES").filter(|d| !d.as_os_str().is_empty()) {
+    if let Some(d) = env("DURABLE_ENVISION_PROFILES").filter(|d| !d.as_os_str().is_empty()) {
         return Some(d);
     }
+    Some(config_dir(env)?.join("durable-envision").join("profiles"))
+}
+
+/// The user's configuration folder, given a way to read environment variables.
+fn config_dir(env: impl Fn(&str) -> Option<PathBuf>) -> Option<PathBuf> {
     // Windows sets HOME only in Unix-like shells, so %APPDATA% (its per-user config folder)
     // comes first there: PowerShell and Git Bash then share one store.
-    let config = env("XDG_CONFIG_HOME")
+    env("XDG_CONFIG_HOME")
         .filter(|d| d.is_absolute())
         .or_else(|| env("APPDATA").filter(|d| cfg!(windows) && d.is_absolute()))
-        .or_else(|| env("HOME").map(|h| h.join(".config")))?;
-    Some(config.join("tempdes").join("profiles"))
+        .or_else(|| env("HOME").map(|h| h.join(".config")))
+}
+
+/// What the tool was called before it was renamed. The default store's folder had the name too.
+const FORMER_NAME: &str = "tempdes";
+
+/// A note for someone whose profiles the rename left behind: the default store doesn't exist
+/// yet, and the folder it had under the tool's former name does. Nothing is read from that
+/// folder, so without the note those profiles would seem to have gone. There is none when
+/// `DURABLE_ENVISION_PROFILES` names the store, as the default location then plays no part.
+pub fn former_store_note(env: impl Fn(&str) -> Option<PathBuf>) -> Option<String> {
+    if env("DURABLE_ENVISION_PROFILES").is_some_and(|d| !d.as_os_str().is_empty()) {
+        return None;
+    }
+    let config = config_dir(env)?;
+    let store = config.join("durable-envision").join("profiles");
+    let former = config.join(FORMER_NAME).join("profiles");
+    (former.is_dir() && !store.exists()).then(|| {
+        format!(
+            "profiles saved by {FORMER_NAME}, this tool's former name, are still in {}: move that folder to {} to use them",
+            former.display(),
+            store.display()
+        )
+    })
 }
 
 /// Period names (`--period`) are one path component: letters, digits, `-` and `_`, other than
@@ -787,7 +816,7 @@ mod tests {
             .unwrap()
             .as_nanos();
         let d = std::env::temp_dir().join(format!(
-            "tempdes-profile-test-{tag}-{}-{nanos}",
+            "durable-envision-profile-test-{tag}-{}-{nanos}",
             std::process::id()
         ));
         std::fs::create_dir_all(&d).unwrap();
@@ -816,7 +845,7 @@ mod tests {
         };
         assert_eq!(
             default_dir(env(vec![
-                ("TEMPDES_PROFILES", abs("/p")),
+                ("DURABLE_ENVISION_PROFILES", abs("/p")),
                 ("HOME", abs("/h"))
             ])),
             Some(abs("/p"))
@@ -826,7 +855,7 @@ mod tests {
                 ("XDG_CONFIG_HOME", abs("/x")),
                 ("HOME", abs("/h"))
             ])),
-            Some(abs("/x/tempdes/profiles"))
+            Some(abs("/x/durable-envision/profiles"))
         );
         // a relative XDG_CONFIG_HOME is ignored, as the XDG spec asks
         assert_eq!(
@@ -834,21 +863,54 @@ mod tests {
                 ("XDG_CONFIG_HOME", "x".into()),
                 ("HOME", abs("/h"))
             ])),
-            Some(abs("/h/.config/tempdes/profiles"))
+            Some(abs("/h/.config/durable-envision/profiles"))
         );
         assert_eq!(
             default_dir(env(vec![("HOME", abs("/h"))])),
-            Some(abs("/h/.config/tempdes/profiles"))
+            Some(abs("/h/.config/durable-envision/profiles"))
         );
         // %APPDATA% counts only on Windows, where it wins over HOME
         let appdata = default_dir(env(vec![("APPDATA", abs("/a")), ("HOME", abs("/h"))]));
         let expected = if cfg!(windows) {
-            "/a/tempdes/profiles"
+            "/a/durable-envision/profiles"
         } else {
-            "/h/.config/tempdes/profiles"
+            "/h/.config/durable-envision/profiles"
         };
         assert_eq!(appdata, Some(abs(expected)));
         assert_eq!(default_dir(env(vec![])), None);
+    }
+
+    #[test]
+    fn profiles_left_under_the_former_name_get_a_note() {
+        let config = temp_dir("former-name");
+        let env = |vars: Vec<(&'static str, PathBuf)>| {
+            move |k: &str| vars.iter().find(|(n, _)| *n == k).map(|(_, v)| v.clone())
+        };
+        let default = || env(vec![("XDG_CONFIG_HOME", config.clone())]);
+        // nothing was saved under either name
+        assert_eq!(former_store_note(default()), None);
+
+        let former = config.join("tempdes").join("profiles");
+        let store = config.join("durable-envision").join("profiles");
+        std::fs::create_dir_all(former.join("prod")).unwrap();
+        let note = former_store_note(default()).expect("a note");
+        assert!(note.contains(&former.display().to_string()), "{note}");
+        assert!(note.contains(&store.display().to_string()), "{note}");
+        assert!(!note.contains('\n'), "{note}");
+        // the default store is the one the note is about
+        assert_eq!(default_dir(default()), Some(store.clone()));
+
+        // a store named outright isn't at the default location
+        let named = env(vec![
+            ("XDG_CONFIG_HOME", config.clone()),
+            ("DURABLE_ENVISION_PROFILES", config.join("elsewhere")),
+        ]);
+        assert_eq!(former_store_note(named), None);
+
+        // once the store exists, its profiles are the ones in use
+        std::fs::create_dir_all(&store).unwrap();
+        assert_eq!(former_store_note(default()), None);
+        std::fs::remove_dir_all(&config).ok();
     }
 
     #[test]
@@ -1126,7 +1188,10 @@ mod tests {
         let err = store.folder("single").unwrap_err().to_string();
         assert!(err.contains("no folder"), "{err}");
         let err = store.folder("nope").unwrap_err().to_string();
-        assert!(err.contains("`tempdes profile init nope`"), "{err}");
+        assert!(
+            err.contains("`durable-envision profile init nope`"),
+            "{err}"
+        );
         // relative paths are inside the folder, absolute ones as given
         let area = dir.join(METRICS_DIR);
         assert_eq!(

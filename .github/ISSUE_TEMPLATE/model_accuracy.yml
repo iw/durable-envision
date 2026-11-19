@@ -5,16 +5,16 @@ body:
   - type: markdown
     attributes:
       value: |
-        Evidence from real clusters is the most valuable input tempdes can get. Share what you can.
-        Aggregated metrics are enough, and you don't need to include anything identifying.
+        Evidence from real clusters is the most valuable input Durable Envision can get. Share what
+        you can. Aggregated metrics are enough, and you don't need to include anything identifying.
   - type: textarea
     id: difference
     attributes:
       label: What differs?
       description: >-
-        What tempdes predicts, and what your cluster shows. Include the Temporal metric names and
-        values, for example `persistence_latency` p99 or `service_errors_resource_exhausted` by
-        cause.
+        What Durable Envision predicts, and what your cluster shows. Include the Temporal metric
+        names and values, for example `persistence_latency` p99 or
+        `service_errors_resource_exhausted` by cause.
     validations:
       required: true
   - type: textarea
@@ -34,7 +34,7 @@ body:
     id: observations
     attributes:
       label: Observed metrics
-      description: An observations file (see `tempdes metrics template`) or PromQL results.
+      description: An observations file (see `durable-envision metrics template`) or PromQL results.
       render: yaml
   - type: dropdown
     id: store

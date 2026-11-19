@@ -1,5 +1,6 @@
-//! `tempdes metrics fetch` against a stand-in Prometheus HTTP API: the file it writes must read
-//! back as the observations tempdes uses, whichever names the cluster's exporter gives metrics.
+//! `durable-envision metrics fetch` against a stand-in Prometheus HTTP API: the file it writes must
+//! read back as the observations Durable Envision uses, whichever names the cluster's exporter
+//! gives metrics.
 
 #![cfg(feature = "fetch")]
 
@@ -7,11 +8,11 @@ use std::collections::BTreeMap;
 use std::io::{BufRead, BufReader, Write};
 use std::net::TcpListener;
 
-use tempdes::calibrate::cpu_cores;
-use tempdes::metrics::cmd::CPU_SELECTOR;
-use tempdes::metrics::fetch::{Conn, FetchArgs, ScanArgs, fetch, scan};
-use tempdes::metrics::observed::Observations;
-use tempdes::model::types::Service;
+use durable_envision::calibrate::cpu_cores;
+use durable_envision::metrics::cmd::CPU_SELECTOR;
+use durable_envision::metrics::fetch::{Conn, FetchArgs, ScanArgs, fetch, scan};
+use durable_envision::metrics::observed::Observations;
+use durable_envision::model::types::Service;
 
 /// How the stand-in names Temporal's metrics.
 #[derive(Clone, Copy, Debug)]
@@ -398,7 +399,10 @@ fn prometheus(e: Exporter) -> String {
 #[test]
 fn fetched_observations_read_back_whatever_the_exporter() {
     for e in [Exporter::Tally, Exporter::Otel] {
-        let dir = std::env::temp_dir().join(format!("tempdes-fetch-{}-{e:?}", std::process::id()));
+        let dir = std::env::temp_dir().join(format!(
+            "durable-envision-fetch-{}-{e:?}",
+            std::process::id()
+        ));
         std::fs::create_dir_all(&dir).unwrap();
         let out = dir.join("observed.yaml");
         fetch(&FetchArgs {
@@ -461,7 +465,7 @@ fn fetched_observations_read_back_whatever_the_exporter() {
         );
         let api = o.latency("service_latency", &start).unwrap();
         assert!((api.quantile_us(0.99).unwrap() - 54_000.0).abs() < 1.0);
-        // read as tempdes reads it (the loader drops `_total`)
+        // read as Durable Envision reads it (the loader drops `_total`)
         assert_eq!(cpu_cores(&o, Service::History), Some(3.9));
         assert_eq!(o.value_sum("db_utilization", &[]), Some(0.35));
         assert_eq!(o.value_sum("approximate_backlog_count", &[]), Some(1200.0));
@@ -586,20 +590,27 @@ fn scan_says_what_there_is_when_the_range_is_empty() {
     }
 }
 
-/// `tempdes` itself, its profile store in `store`.
-fn tempdes(store: &std::path::Path, args: &[&str]) -> std::process::Output {
-    std::process::Command::new(env!("CARGO_BIN_EXE_tempdes"))
+/// `durable-envision` itself, its profile store in `store`.
+fn durable_envision(store: &std::path::Path, args: &[&str]) -> std::process::Output {
+    std::process::Command::new(env!("CARGO_BIN_EXE_durable-envision"))
         .args(args)
-        .env("TEMPDES_PROFILES", store)
+        .env("DURABLE_ENVISION_PROFILES", store)
         .output()
         .unwrap()
 }
 
 #[test]
 fn with_a_profile_observations_go_into_its_metrics_folder() {
-    let store = std::env::temp_dir().join(format!("tempdes-fetch-profile-{}", std::process::id()));
+    let store = std::env::temp_dir().join(format!(
+        "durable-envision-fetch-profile-{}",
+        std::process::id()
+    ));
     let _ = std::fs::remove_dir_all(&store);
-    assert!(tempdes(&store, &["profile", "init", "p"]).status.success());
+    assert!(
+        durable_envision(&store, &["profile", "init", "p"])
+            .status
+            .success()
+    );
     let url = prometheus(Exporter::Tally);
     let fetch = |extra: &[&str]| {
         let mut args = vec![
@@ -613,7 +624,7 @@ fn with_a_profile_observations_go_into_its_metrics_folder() {
             "p",
         ];
         args.extend_from_slice(extra);
-        tempdes(&store, &args)
+        durable_envision(&store, &args)
     };
     let out = fetch(&["--baseline-end", "2026-10-01 21:55"]);
     let stderr = String::from_utf8_lossy(&out.stderr);
@@ -667,11 +678,11 @@ fn with_a_profile_observations_go_into_its_metrics_folder() {
         "--period",
         "202610012217",
     ];
-    assert!(!tempdes(&store, &args).status.success());
+    assert!(!durable_envision(&store, &args).status.success());
     args.truncate(6);
     // a profile that doesn't exist says how to start one
     args.extend(["--profile", "nope"]);
-    let out = tempdes(&store, &args);
+    let out = durable_envision(&store, &args);
     assert!(!out.status.success());
-    assert!(String::from_utf8_lossy(&out.stderr).contains("`tempdes profile init nope`"));
+    assert!(String::from_utf8_lossy(&out.stderr).contains("`durable-envision profile init nope`"));
 }

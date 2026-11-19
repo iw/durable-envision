@@ -4,8 +4,8 @@
 # parent with a workflow task. A child's first workflow task comes from the parent once the
 # start is recorded.
 #
-#   tempdes run examples/scenarios/child-workflows.yaml
-#   tempdes sweep examples/scenarios/child-workflows.yaml \
+#   durable-envision run examples/scenarios/child-workflows.yaml
+#   durable-envision sweep examples/scenarios/child-workflows.yaml \
 #       --rows history=3,6 --cols history.shardIOConcurrency=1,4
 name: orders-child-workflows
 description: >

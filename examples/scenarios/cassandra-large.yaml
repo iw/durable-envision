@@ -1,7 +1,7 @@
 # A large Cassandra-backed cluster. Temporal 1.31.0 forces the shard IO semaphore to 1 on
 # Cassandra, so per-shard write throughput is bounded by LWT latency; numHistoryShards (4096) sets
 # the ceiling. Good for sweeps:
-#   tempdes sweep examples/scenarios/cassandra-large.yaml --rows history=6,9,12 --cols load=0.5,1,1.5
+#   durable-envision sweep examples/scenarios/cassandra-large.yaml --rows history=6,9,12 --cols load=0.5,1,1.5
 name: cassandra-4096
 seed: 13
 warmup: 15s

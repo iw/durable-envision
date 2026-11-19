@@ -61,7 +61,7 @@ fn severity(s: Severity) -> &'static str {
 pub fn render_run(r: &RunResult, verbose: bool) -> String {
     let mut o = String::new();
     let rep = &r.config.replicas;
-    let _ = writeln!(o, "# tempdes: {}\n", r.scenario);
+    let _ = writeln!(o, "# Durable Envision: {}\n", r.scenario);
     let _ = writeln!(
         o,
         "Temporal {}{}. Replicas: frontend {}, history {}, matching {}, worker {}. {} history shards, {} (capacity {}), client LB {}. {:.0}s measured after {:.0}s of warm-up, simulated in {:.1}s.\n",
@@ -560,7 +560,7 @@ pub fn render_run(r: &RunResult, verbose: bool) -> String {
 /// A sweep: one table per view, then each cell's top hotspot.
 pub fn render_sweep(r: &SweepResult) -> String {
     let mut o = String::new();
-    let _ = writeln!(o, "# tempdes sweep: {}\n", r.scenario);
+    let _ = writeln!(o, "# Durable Envision sweep: {}\n", r.scenario);
     let _ = writeln!(
         o,
         "Temporal {}. {} cells, simulated in {:.1}s{}.\n",
@@ -697,7 +697,7 @@ mod tests {
             wall_ms: 1500,
         };
         let md = render_sweep(&r);
-        assert!(md.starts_with("# tempdes sweep: orders-baseline\n"));
+        assert!(md.starts_with("# Durable Envision sweep: orders-baseline\n"));
         for (_, title, _) in crate::sweep::views() {
             assert!(md.contains(&format!("## {title}\n")), "missing {title}");
         }

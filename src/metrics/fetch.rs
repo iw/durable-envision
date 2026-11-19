@@ -1,4 +1,4 @@
-//! `tempdes metrics fetch` and `scan`: observations read from a Prometheus HTTP API.
+//! `durable-envision metrics fetch` and `scan`: observations read from a Prometheus HTTP API.
 //!
 //! `fetch` runs the queries of [`SPECS`] as instant queries at the end of a window and writes an
 //! observations file. `scan` prints the rate of workflow-starting calls minute by minute, to
@@ -509,7 +509,7 @@ fn render(o: &Observed, t: f64, window: &str, description: &str) -> String {
     let mut out = String::new();
     let _ = writeln!(
         out,
-        "# tempdes observations, written by `tempdes metrics fetch`"
+        "# Durable Envision observations, written by `durable-envision metrics fetch`"
     );
     let _ = writeln!(
         out,

@@ -1,4 +1,5 @@
-//! tempdes — a discrete-event simulator for Temporal Server 1.31.0 capacity and hotspot analysis.
+//! Durable Envision — a discrete-event simulator for Temporal Server 1.31.0 capacity and hotspot
+//! analysis.
 
 pub mod calibrate;
 pub mod cli;

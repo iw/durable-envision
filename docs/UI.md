@@ -1,14 +1,14 @@
-# The live view (`tempdes ui`)
+# The live view (`durable-envision ui`)
 
-`tempdes ui` simulates one configuration and serves a page that shows the cluster while it
-runs. Where `tempdes run` gives you the ranked hotspots at the end, the live view shows how
+`durable-envision ui` simulates one configuration and serves a page that shows the cluster while it
+runs. Where `durable-envision run` gives you the ranked hotspots at the end, the live view shows how
 they come about: which service saturates first, and how that saturation turns into waiting,
 retries and rejections upstream and downstream of it.
 
 ```bash
-tempdes ui examples/scenarios/baseline.yaml --open
-tempdes ui examples/scenarios/db-bound.yaml --speed 5 -r history=6
-tempdes ui examples/scenarios/hot-entity.yaml --speed 0   # as fast as the machine allows
+durable-envision ui examples/scenarios/baseline.yaml --open
+durable-envision ui examples/scenarios/db-bound.yaml --speed 5 -r history=6
+durable-envision ui examples/scenarios/hot-entity.yaml --speed 0   # as fast as the machine allows
 ```
 
 The command takes the same scenario, overrides (`-r`, `-d`, `--load`, `--seed`,
@@ -112,5 +112,5 @@ script is served from an asset bundle that only the separate `topcoat` CLI produ
 build, and a `cargo install`ed tool cannot depend on that step. Server-sent events and a
 small script give the same result with everything compiled into the binary.
 
-`tempdes` is built with the `ui` feature by default. `cargo build --no-default-features`
+`durable-envision` is built with the `ui` feature by default. `cargo build --no-default-features`
 gives the lean command-line tool without Topcoat and tokio.

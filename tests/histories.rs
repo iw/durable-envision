@@ -1,12 +1,12 @@
-//! `tempdes workload import`: histories in both export spellings become steps, pooled
+//! `durable-envision workload import`: histories in both export spellings become steps, pooled
 //! programs and a scenario that simulates.
 
+use durable_envision::config::scenario::Scenario;
+use durable_envision::histories::trace::{Outcome, Step, trace};
+use durable_envision::histories::{Options, parse::parse_history, program};
+use durable_envision::report;
+use durable_envision::run::{self, Overrides};
 use serde_json::{Value, json};
-use tempdes::config::scenario::Scenario;
-use tempdes::histories::trace::{Outcome, Step, trace};
-use tempdes::histories::{Options, parse::parse_history, program};
-use tempdes::report;
-use tempdes::run::{self, Overrides};
 
 /// Builds a workflow history the way the CLI or the Web UI export it, with event times in
 /// milliseconds after `start_ms`.
@@ -900,7 +900,7 @@ fn worker_processes_are_counted_per_task_queue_without_naming_them() {
     );
     assert!(
         p.summary
-            .contains("workers report temporal-java 1.29.0: tempdes follows the Go SDK")
+            .contains("workers report temporal-java 1.29.0: Durable Envision follows the Go SDK")
     );
     // identities name hosts: they are counted, never written
     for text in [&p.yaml, &p.summary] {
@@ -936,7 +936,7 @@ fn worker_processes_are_counted_per_task_queue_without_naming_them() {
 
 #[test]
 fn imported_workloads_simulate() {
-    let dir = std::env::temp_dir().join(format!("tempdes-import-{}", std::process::id()));
+    let dir = std::env::temp_dir().join(format!("durable-envision-import-{}", std::process::id()));
     std::fs::create_dir_all(&dir).unwrap();
     for i in 0..10 {
         let attempts = if i % 5 == 0 { 3 } else { 1 };
@@ -947,7 +947,7 @@ fn imported_workloads_simulate() {
         .unwrap();
     }
     std::fs::write(dir.join("notes.txt"), "not a history").unwrap();
-    let p = tempdes::histories::import(
+    let p = durable_envision::histories::import(
         std::slice::from_ref(&dir),
         &Options {
             namespace: "orders".into(),
@@ -991,20 +991,27 @@ fn imported_workloads_simulate() {
     );
 }
 
-/// `tempdes` itself, its profile store in `store`.
-fn tempdes(store: &std::path::Path, args: &[&str]) -> std::process::Output {
-    std::process::Command::new(env!("CARGO_BIN_EXE_tempdes"))
+/// `durable-envision` itself, its profile store in `store`.
+fn durable_envision(store: &std::path::Path, args: &[&str]) -> std::process::Output {
+    std::process::Command::new(env!("CARGO_BIN_EXE_durable-envision"))
         .args(args)
-        .env("TEMPDES_PROFILES", store)
+        .env("DURABLE_ENVISION_PROFILES", store)
         .output()
         .unwrap()
 }
 
 #[test]
 fn with_a_profile_import_reads_and_writes_its_workload_folder() {
-    let store = std::env::temp_dir().join(format!("tempdes-import-profile-{}", std::process::id()));
+    let store = std::env::temp_dir().join(format!(
+        "durable-envision-import-profile-{}",
+        std::process::id()
+    ));
     let _ = std::fs::remove_dir_all(&store);
-    assert!(tempdes(&store, &["profile", "init", "p"]).status.success());
+    assert!(
+        durable_envision(&store, &["profile", "init", "p"])
+            .status
+            .success()
+    );
     let histories = store.join("p/workload/histories");
     std::fs::create_dir_all(&histories).unwrap();
     for i in 0..3 {
@@ -1012,7 +1019,7 @@ fn with_a_profile_import_reads_and_writes_its_workload_folder() {
         std::fs::write(histories.join(format!("o{i}.json")), text).unwrap();
     }
     // its histories by default, into workflows.yaml rather than to standard output
-    let out = tempdes(
+    let out = durable_envision(
         &store,
         &[
             "workload",
@@ -1032,7 +1039,7 @@ fn with_a_profile_import_reads_and_writes_its_workload_folder() {
         "{yaml}"
     );
     // relative paths are inside the folder
-    let out = tempdes(
+    let out = durable_envision(
         &store,
         &[
             "workload",
@@ -1051,12 +1058,19 @@ fn with_a_profile_import_reads_and_writes_its_workload_folder() {
     );
     assert!(store.join("p/workload/again.yaml").is_file());
     // without a profile, the histories must be given
-    assert!(!tempdes(&store, &["workload", "import"]).status.success());
+    assert!(
+        !durable_envision(&store, &["workload", "import"])
+            .status
+            .success()
+    );
 }
 
 #[test]
 fn a_scenario_takes_its_workflows_from_a_file_or_a_folder() {
-    let dir = std::env::temp_dir().join(format!("tempdes-workflows-file-{}", std::process::id()));
+    let dir = std::env::temp_dir().join(format!(
+        "durable-envision-workflows-file-{}",
+        std::process::id()
+    ));
     let _ = std::fs::remove_dir_all(&dir);
     let period = dir.join("workload/202610012217");
     std::fs::create_dir_all(&period).unwrap();
@@ -1066,7 +1080,7 @@ fn a_scenario_takes_its_workflows_from_a_file_or_a_folder() {
         let text = order(f64::from(i) * 1000.0, 1, false, false);
         std::fs::write(histories.join(format!("o{i}.json")), text).unwrap();
     }
-    let p = tempdes::histories::import(
+    let p = durable_envision::histories::import(
         std::slice::from_ref(&histories),
         &Options {
             namespace: "orders".into(),
@@ -1109,7 +1123,7 @@ fn a_scenario_takes_its_workflows_from_a_file_or_a_folder() {
         .unwrap_err()
         .to_string();
     assert!(err.contains("doesn't exist"), "{err}");
-    assert!(err.contains("tempdes workload import"), "{err}");
+    assert!(err.contains("durable-envision workload import"), "{err}");
     // only its workflows are read, so fleets put there would be lost
     let uncommented = p
         .yaml

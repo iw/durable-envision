@@ -1,7 +1,7 @@
 # Observed production metrics for the orders cluster (weekday peak, 15 minute window).
-# Collected with the queries printed by `tempdes metrics queries --window 15m`.
+# Collected with the queries printed by `durable-envision metrics queries --window 15m`.
 #
-#   tempdes run examples/scenarios/baseline.yaml -o examples/metrics/observed.yaml
+#   durable-envision run examples/scenarios/baseline.yaml -o examples/metrics/observed.yaml
 description: orders cluster, Tuesday 10:00-10:15 UTC
 window: 15m
 
@@ -11,10 +11,10 @@ metrics:
     labels: { service_name: frontend, operation: StartWorkflowExecution }
     rate: 180/s
 
-  # database latency (p50/p90/p99 from persistence_latency histograms). tempdes fits service
-  # times so that its simulated latency, queueing included, matches these. Create and
-  # UpdateWorkflowExecution latency includes the history append made inside the call, so
-  # production shows no separate AppendHistoryNodes latency for normal workflow writes.
+  # database latency (p50/p90/p99 from persistence_latency histograms). Durable Envision fits
+  # service times so that its simulated latency, queueing included, matches these. Create and
+  # UpdateWorkflowExecution latency includes the history append made inside the call, so production
+  # shows no separate AppendHistoryNodes latency for normal workflow writes.
   - name: persistence_latency
     labels: { operation: UpdateWorkflowExecution }
     p50: 3.4ms

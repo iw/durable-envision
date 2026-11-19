@@ -1,4 +1,4 @@
-# How tempdes models Temporal 1.31.0
+# How Durable Envision models Temporal 1.31.0
 
 This page describes what the simulator does at each step of a request, and which Temporal
 1.31.0 code it follows. Source paths refer to the `temporalio/temporal` repository at tag
@@ -35,7 +35,7 @@ This page describes what the simulator does at each step of a request, and which
 
 ## Routing and membership
 
-| Mechanism | Temporal 1.31.0 | tempdes |
+| Mechanism | Temporal 1.31.0 | Durable Envision |
 |---|---|---|
 | Workflow → shard | `common/util.go` `WorkflowIDToHistoryShard`: `farm.Fingerprint32(nsID + "_" + wfID) % numShards + 1` | Same hash (`src/util/farmhash.rs`), verified against go-farm test vectors |
 | Shard → history pod | ringpop hash ring, `common/membership/ringpop/service_resolver.go`, key `strconv.Itoa(shardID)` | Same ring (`src/model/ring.rs`): `system.ringpopReplicaPoints` points per member, hashed `Fingerprint32(address + index)` |
@@ -118,9 +118,9 @@ Each API follows the real handler sequence (`service/history/api/*`):
    * A timeout returns `BUSY_WORKFLOW` (`service/history/consts/const.go`).
 5. **Mutable state** through the host-level LRU (`history.hostLevelCacheMaxSize`, keyed with the
    shard epoch). A miss costs `GetWorkflowExecution`.
-   * **Expiry.** An entry expires `history.cacheTTL` (1 h) after it was cached, however often it
-     is read (`common/cache/lru.go`). The access that finds it expired is a miss and loads it
-     again. Temporal spares an entry that another call holds at that moment; tempdes doesn't.
+   * **Expiry.** An entry expires `history.cacheTTL` (1 h) after it was cached, however often it is
+     read (`common/cache/lru.go`). The access that finds it expired is a miss and loads it again.
+     Temporal spares an entry that another call holds at that moment; Durable Envision doesn't.
    * **New runs.** Update-with-start caches its new run with the mutable state, which holds the
      update registry (`workflowLeaseCallback` in `service/history/api/multioperation/api.go`).
      Other starts don't populate the cache.
@@ -346,10 +346,10 @@ Transfer, timer and visibility queues follow `service/history/queues/`:
     `task_latency_schedule` from it as the run ends, with `task_requests` (`Execute`). The
     scheduling wait therefore starts when the limiter admits a task. A run on a workflow's
     execution queue meets no limiter (`HandleBusyWorkflow`).
-  * How long the enforced limiter held submissions back is tempdes's measure, not a Temporal
-    metric. It is counted per task type and per namespace. Submissions still held when the
-    window closes count as held until then, and a task type the limiter refused shows even if
-    it ran nothing.
+  * How long the enforced limiter held submissions back is Durable Envision's measure, not a
+    Temporal metric. It is counted per task type and per namespace. Submissions still held when the
+    window closes count as held until then, and a task type the limiter refused shows even if it ran
+    nothing.
 * **Execution** (`executable.go`):
   * The task takes the workflow lock as a non-API caller, loads mutable state and does its work.
     Examples: `AddWorkflowTask`/`AddActivityTask` to matching, starting a child, firing a
@@ -525,7 +525,7 @@ Workers follow the Go SDK.
 
 ## Workloads from histories (`src/histories`)
 
-`tempdes workload import` builds `workflows:` entries from exported histories.
+`durable-envision workload import` builds `workflows:` entries from exported histories.
 
 * **Events to steps.** The commands issued by one workflow task form a step: activities
   scheduled together run in parallel, `LocalActivity` (or `core_local_activity`) markers are

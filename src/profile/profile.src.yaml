@@ -1,19 +1,20 @@
-# tempdes profile __NAME__: the options of a run, written by `tempdes profile init`.
-#   tempdes run --profile __NAME__        (also sweep and ui)
+# Durable Envision profile __NAME__: the options of a run, written by
+# `durable-envision profile init`.
+#   durable-envision run --profile __NAME__        (also sweep and ui)
 # Options given on the command line apply on top: lists grow, and single values replace these.
 #
-# Keep it private. The profile store (`tempdes profile dir`) is outside any repository, and
+# Keep it private. The profile store (`durable-envision profile dir`) is outside any repository, and
 # its folders are readable only by you. Paths here are relative to this folder, and so is
 # scenario_dir unless absolute. Commented-out settings show an example: uncomment to use them.
 #
-# With --profile __NAME__, what tempdes fetches and imports goes into this folder:
-#   metrics/    tempdes metrics fetch: the observed metrics (observed.yaml, baseline.yaml)
-#   workload/   tempdes workload fetch and import: the histories (histories/), and the
+# With --profile __NAME__, what Durable Envision fetches and imports goes into this folder:
+#   metrics/    durable-envision metrics fetch: the observed metrics (observed.yaml, baseline.yaml)
+#   workload/   durable-envision workload fetch and import: the histories (histories/), and the
 #               workflows inferred from them (workflows.yaml)
 # With --period PERIOD too, a period's files go into a folder of its own in each:
 # metrics/PERIOD/ and workload/PERIOD/.
 
-description: __DESCRIPTION__   # shown by `tempdes profile list`
+description: __DESCRIPTION__   # shown by `durable-envision profile list`
 
 scenario: scenario.yaml               # the cluster and its workload
 
@@ -25,7 +26,7 @@ scenario_dir: .
 #}off
 
 # Observed metrics, to calibrate against and to validate the run with, as
-# `tempdes metrics fetch --profile __NAME__ ...` writes them.
+# `durable-envision metrics fetch --profile __NAME__ ...` writes them.
 #{off
 observed:
   - metrics/observed.yaml

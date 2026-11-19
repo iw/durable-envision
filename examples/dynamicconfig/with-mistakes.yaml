@@ -1,5 +1,5 @@
 # Common dynamic config mistakes that Temporal 1.31.0 silently ignores.
-#   tempdes dc validate examples/dynamicconfig/with-mistakes.yaml
+#   durable-envision dc validate examples/dynamicconfig/with-mistakes.yaml
 
 # typo in the key: the server logs "unregistered key" and ignores it
 history.shardIoConcurency:

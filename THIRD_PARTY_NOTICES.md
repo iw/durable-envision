@@ -1,6 +1,6 @@
 # Third-party notices
 
-tempdes is licensed under either of the [MIT license](LICENSE-MIT) or the
+Durable Envision is licensed under either of the [MIT license](LICENSE-MIT) or the
 [Apache License, Version 2.0](LICENSE-APACHE), at your option. Some parts of it are derived
 from the projects below. Their licenses ask for these notices to be kept with copies of that
 material.

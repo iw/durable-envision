@@ -1,7 +1,7 @@
-# Contributing to tempdes
+# Contributing to Durable Envision
 
-Thanks for your interest in improving tempdes. It is a simulator, so it is only as useful as its
-model is faithful to Temporal. The most valuable contributions are:
+Thanks for your interest in improving Durable Envision. It is a simulator, so it is only as useful
+as its model is faithful to Temporal. The most valuable contributions are:
 
 * **production evidence**: scenarios and observed metrics where the simulation disagrees with a
   real cluster;
@@ -19,7 +19,7 @@ clippy and rustfmt) in `rust-toolchain.toml`, and rustup installs it the first t
 `cargo`.
 
 ```bash
-git clone https://github.com/iw/tempdes && cd tempdes
+git clone https://github.com/iw/durable-envision && cd durable-envision
 cargo run --release -- run examples/scenarios/baseline.yaml
 ```
 
@@ -59,7 +59,7 @@ code it follows. When you add or change a mechanism:
    must keep surfacing the hotspot it was built to show, and parameter changes must move results
    in the expected direction. Unit tests live next to the code.
 4. **Mind the cost.** Simulations should stay fast enough to sweep. Measure before and after
-   with `tempdes run` on `examples/scenarios/cassandra-large.yaml`.
+   with `durable-envision run` on `examples/scenarios/cassandra-large.yaml`.
 
 ### Hotspot rules
 
