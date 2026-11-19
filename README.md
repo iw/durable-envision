@@ -1018,8 +1018,8 @@ projects look at the workflows' code, and at a deployment that is already runnin
 
 * [Durable Atlas](https://github.com/iw/durable-atlas), diagrams of Temporal workflows read from
   their Kotlin source, with recorded executions laid over them.
-* [Durable Inquiry](https://github.com/iw/kyumei), evidence-driven diagnostics that find out why
-  a running Temporal deployment is misbehaving.
+* [Durable Inquiry](https://github.com/iw/durable-inquiry), evidence-driven diagnostics that
+  find out why a running Temporal deployment is misbehaving.
 
 ## Development
 
